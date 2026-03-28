@@ -74,6 +74,7 @@ Homepage = "https://github.com/fastmvc/fast.cli"
 Repository = "https://github.com/fastmvc/fast.cli"
 
 [project.scripts]
+fast = "fast_cli.app:main"
 fast-cli = "fast_cli.app:main"
 fastmvc = "fast_cli.app:main"
 

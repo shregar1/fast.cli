@@ -1,26 +1,326 @@
-# fast.cli
+# fast-cli
 
-Fast Framework CLI.
+**FastMVC CLI** — a console toolkit for generating FastAPI / FastMVC projects, scaffolding APIs, running database migrations, and maintaining a few operational utilities.
 
-## Related — FastMVC repo
+Use the **`fast`** command (shortest). The same program is also available as **`fast-cli`** and **`fastmvc`** for compatibility.
 
-The **framework** and canonical **`_maint`** tooling (including the same commit-history script) live in the sibling checkout:
+---
 
-| | |
-|--|--|
-| **Local path** | `../fast_mvc` |
-| **GitHub** | https://github.com/shregar1/fast.mvc |
+## Contents
 
-This repo records commits to **`commit_history.json`** via **`.pre-commit-config.yaml`** (`post-commit`). To install the same tooling in **any** git repository (writes `_maint/scripts/git_log_recorder.py` and merges the hook):
+- [Install](#install)
+- [Global options](#global-options)
+- [Command map](#command-map)
+- [Project generation](#project-generation)
+- [Scaffolding (`add`)](#scaffolding-add)
+- [Environment (`env`)](#environment-env)
+- [Database migrations (`db`)](#database-migrations-db)
+- [Documentation (`docs`)](#documentation-docs)
+- [Caching (`cache`)](#caching-cache)
+- [Background tasks (`tasks`)](#background-tasks-tasks)
+- [Cleanup (`decimate`)](#cleanup-decimate)
+- [Commit history (`setup-commit-log`)](#commit-history-setup-commit-log)
+- [Legacy (`make`)](#legacy-make)
+- [Related repositories](#related-repositories)
+- [Layout](#layout)
+
+---
+
+## Install
 
 ```bash
-fast-cli setup-commit-log
-# or: fastmvc setup-commit-log
+pip install fast-cli
 ```
 
-In this repository the hook runs **`fast_cli/bundled/git_log_recorder.py`**; the setup command copies that script into `_maint/scripts/` when used elsewhere.
+Interactive prompts (wizard-style flows) use **Questionary**. Install it for the full experience:
 
-Manual hook install (if you skip `--install-hooks`):
+```bash
+pip install "fast-cli[interactive]"
+```
+
+For development and tests:
+
+```bash
+pip install "fast-cli[dev]"
+```
+
+Requires **Python 3.10+**.
+
+---
+
+## Global options
+
+| Option | Description |
+|--------|-------------|
+| `--version` | Print the package version and exit. |
+| `--help` | Show help for the root group or any subcommand. |
+
+Discover everything at once:
+
+```bash
+fast --help
+fast <command> --help
+```
+
+---
+
+## Command map
+
+| Area | Command | Purpose |
+|------|---------|---------|
+| **Projects** | `generate`, `new`, `quickstart` | Create a new FastMVC-style project (interactive or flags). |
+| **Scaffold** | `add resource` | Add a versioned API operation (DTOs, repo, service, controllers). |
+| **Env** | `env` | Generate `.env` from `.env.example` in the current project. |
+| **DB** | `db migrate`, `upgrade`, `downgrade`, `reset`, `history`, `status` | Alembic wrappers (run from a directory with `alembic.ini`). |
+| **Docs** | `docs generate`, `docs deploy` | Generate MkDocs-style reference stubs; deploy with `mkdocs gh-deploy`. |
+| **Cache** | `cache clear`, `cache invalidate` | Clear or tag-invalidate FastCaching (requires `fast_caching`). |
+| **Tasks** | `tasks worker`, `list`, `status`, `dashboard` | FastTasks / `fast_platform` workers (optional). |
+| **Cleanup** | `decimate` | Delete build/cache artifacts under a path. |
+| **Repo tooling** | `setup-commit-log` | Install commit-history recorder + pre-commit hook in any git repo. |
+| **Legacy** | `make` | Deprecated; forwards to `add` or `env`. |
+
+---
+
+## Project generation
+
+Commands: **`generate`**, **`new`** (alias), **`quickstart`**.
+
+### Behavior
+
+- **`generate`** / **`new`**: If you pass **both** `--name` and `--path`, the CLI runs non-interactively from those options. If either is missing, it starts the **interactive** generator.
+- **`quickstart`**: Creates a project with defaults (project name defaults to `my_fastapi_project` unless you set `--name`).
+
+### Options (`generate` / `new`)
+
+| Option | Shorthand | Default | Description |
+|--------|-----------|---------|-------------|
+| `--name` | `-n` | — | Project name. |
+| `--path` | `-p` | — | Target directory (use `.` for current dir). |
+| `--author` | `-a` | — | Author name. |
+| `--email` | `-e` | — | Author email. |
+| `--description` | `-d` | — | Short project description. |
+| `--version` | `-v` | `0.1.0` | Initial project version string. |
+| `--venv` / `--no-venv` | — | `venv` on | Create a virtual environment. |
+| `--venv-name` | — | `.venv` | Virtualenv directory name. |
+| `--install-deps` / `--no-install-deps` | — | install on | Install dependencies after generation. |
+
+### Options (`quickstart`)
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--name` | `my_fastapi_project` | Project name. |
+| `--venv-name` | `.venv` | Virtualenv directory name. |
+| `--install-deps` / `--no-install-deps` | install on | Install dependencies after generation. |
+
+### Examples
+
+```bash
+fast generate
+fast new --name my_api --path ./my_api
+fast quickstart --name demo_api
+```
+
+---
+
+## Scaffolding (`add`)
+
+Command: **`add resource`**.
+
+Scaffolds a **single versioned operation** in an existing FastMVC layout: request/response DTOs, repository, service, dependency provider, core controller, and FastAPI-facing API controller. The CLI must find `abstractions/controller.py` at the resolved project root.
+
+### Options
+
+| Option | Shorthand | Required | Default | Description |
+|--------|-----------|----------|---------|-------------|
+| `--folder` | `-f` | yes | — | Folder segment (e.g. `user`, `auth`). |
+| `--resource` | `-r` | yes | — | Operation name (e.g. `fetch`, `create`). |
+| `--version` | `-v` | no | `v1` | API version (`v1`, `v2`, …). |
+| `--crud` / `--no-crud` | — | no | CRUD on | Reserved for future template variants. |
+
+### Example
+
+```bash
+cd /path/to/your/fastmvc/project
+fast add resource --folder user --resource create --version v1
+```
+
+---
+
+## Environment (`env`)
+
+Command: **`env`**.
+
+Generates a **`.env`** file from **`.env.example`** at the resolved FastMVC project root. Fails if `.env` already exists or `.env.example` is missing (see `ProjectBootstrap` in the codebase).
+
+```bash
+fast env
+```
+
+---
+
+## Database migrations (`db`)
+
+Group: **`db`**. These commands are thin wrappers around the **`alembic`** CLI. Run them from a project directory that contains **`alembic.ini`** (typical FastMVC layout). Install Alembic in that environment: `pip install alembic`.
+
+### `db migrate`
+
+Create a new revision.
+
+| Option | Shorthand | Description |
+|--------|-----------|-------------|
+| `--message` | `-m` | **Required.** Migration message. |
+| `--autogenerate` / `--no-autogenerate` | — | Autogenerate from models (default: on). |
+
+```bash
+fast db migrate -m "Add users table"
+```
+
+### `db upgrade`
+
+Apply migrations.
+
+| Option | Shorthand | Default | Description |
+|--------|-----------|---------|-------------|
+| `--revision` | `-r` | `head` | Revision to upgrade to. |
+
+```bash
+fast db upgrade
+fast db upgrade -r head
+```
+
+### `db downgrade`
+
+Rollback migrations.
+
+| Option | Shorthand | Default | Description |
+|--------|-----------|---------|-------------|
+| `--revision` | `-r` | `-1` | Target revision (default one step back). |
+
+Confirms before running (Questionary or Click confirm).
+
+### `db reset`
+
+**Destructive:** drops all tables (downgrade to base) and reapplies migrations to `head`.
+
+| Option | Description |
+|--------|-------------|
+| `--seed` / `--no-seed` | If `--seed`, runs `scripts/seed.py` when present. |
+
+Requires typing **`RESET`** to confirm.
+
+### `db history`
+
+Show migration history.
+
+| Option | Shorthand | Description |
+|--------|-----------|-------------|
+| `--verbose` / `--no-verbose` | `-v` | More detail from `alembic history`. |
+
+### `db status`
+
+Show current revision, heads, and whether migrations are pending.
+
+---
+
+## Documentation (`docs`)
+
+Group: **`docs`**.
+
+### `docs generate`
+
+Walks **`apis/`** and **`dtos/`** and writes Markdown under **`docs/api/`** (e.g. `endpoints.md`, `dtos.md`, optional `ecosystem.md` for sibling `fast_*` packages). Uses mkdocstrings-style `:::` directives for a later MkDocs build.
+
+```bash
+fast docs generate
+```
+
+### `docs deploy`
+
+Runs **`mkdocs gh-deploy`** with an optional commit message.
+
+| Option | Shorthand | Default |
+|--------|-----------|---------|
+| `--message` | `-m` | `Deploy documentation` |
+
+```bash
+fast docs deploy -m "Update API docs"
+```
+
+---
+
+## Caching (`cache`)
+
+Group: **`cache`**. Requires the **`fast_caching`** package importable in your environment.
+
+### `cache clear`
+
+Purge all resident cache data via the backend.
+
+### `cache invalidate`
+
+Invalidate by tag names.
+
+```bash
+fast cache invalidate user-list product-cache
+```
+
+---
+
+## Background tasks (`tasks`)
+
+Group: **`tasks`**. Uses **`fast_platform`** task APIs when available.
+
+| Command | Description |
+|---------|-------------|
+| `tasks worker` | Start a background worker. `--concurrency` / `-c` (default `10`). |
+| `tasks list` | List registered task definitions. |
+| `tasks status <task_id>` | Show status for one job. |
+| `tasks dashboard` | Live table (refresh `--refresh` / `-r` ms, default `1000`). Ctrl+C to exit. |
+
+```bash
+fast tasks worker -c 8
+fast tasks dashboard -r 2000
+```
+
+---
+
+## Cleanup (`decimate`)
+
+Command: **`decimate [LANGUAGE] [PATH]`**.
+
+**Destructive:** removes build/cache artifacts matching built-in patterns. Defaults: language `python`, path `.`.
+
+Supported language keys include **`python`**, **`java`**, **`rust`** (see `ARTIFACTS_BY_LANGUAGE` in `fast_cli.constants`). Virtualenv directories such as `.venv` are skipped during traversal.
+
+```bash
+fast decimate python .
+fast decimate rust ./my-crate
+```
+
+---
+
+## Commit history (`setup-commit-log`)
+
+Command: **`setup-commit-log`**.
+
+Installs the bundled **`git_log_recorder.py`** into **`_maint/scripts/`**, merges a **local** pre-commit hook into **`.pre-commit-config.yaml`** (post-commit stage), and ensures **`.gitignore`** lists:
+
+- `coverage_output.txt`
+- `commit_history.json`
+
+| Option | Description |
+|--------|-------------|
+| `-C`, `--path` | Git repository root (default: current directory). |
+| `--install-hooks` / `--no-install-hooks` | Run `pre-commit install` and `pre-commit install --hook-type post-commit` (default: install). |
+| `--with-common-hooks` | When **creating** a new `.pre-commit-config.yaml`, also add common hooks (trim whitespace, YAML/JSON checks, etc.). |
+
+```bash
+fast setup-commit-log
+fast setup-commit-log -C /path/to/repo --no-install-hooks
+fast setup-commit-log --with-common-hooks
+```
+
+If you skip automatic install:
 
 ```bash
 pip install pre-commit
@@ -28,14 +328,43 @@ pre-commit install
 pre-commit install --hook-type post-commit
 ```
 
-See **`_maint/README.md`** for details.
+Each commit appends metadata to **`commit_history.json`** at the repository root.
+
+---
+
+## Legacy (`make`)
+
+Command: **`make <resource|env>`**.
+
+Deprecated. Use **`add`** or **`env`** instead.
+
+- `make resource <name>` forwards to `add resource` with fixed defaults.
+- `make env` invokes `env`.
+
+---
+
+## Related repositories
+
+| | |
+|--|--|
+| **FastMVC framework** (sibling checkout) | `../fast_mvc` |
+| **GitHub** | [github.com/shregar1/fast.mvc](https://github.com/shregar1/fast.mvc) |
+
+This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](https://github.com/fastmvc/fast.cli) as the canonical home for **`fast-cli`** on PyPI.
+
+---
 
 ## Layout
 
 ```
 fast.cli/
-├── fast_cli/bundled/   # git_log_recorder.py (source for setup-commit-log)
-├── _maint/scripts/     # optional copy in other repos (see setup-commit-log)
+├── fast_cli/
+│   ├── app.py              # CLI entry point
+│   ├── bundled/          # git_log_recorder.py (source for setup-commit-log)
+│   └── commands/         # Command groups and implementations
+├── _maint/scripts/       # Optional copy in other repos (see setup-commit-log)
 ├── .pre-commit-config.yaml
 └── …
 ```
+
+For maintainer notes, see **`_maint/README.md`**.

@@ -1,6 +1,6 @@
 """Fast CLI — FastMVC framework command-line tools.
 
-This package publishes the ``fast-cli`` / ``fastmvc`` console entry points and
+This package publishes the ``fast``, ``fast-cli``, and ``fastmvc`` console entry points and
 the programmatic building blocks used to scaffold FastAPI projects that follow
 the FastMVC layout (controllers, services, DTOs, Alembic, etc.).
 
@@ -17,7 +17,7 @@ the FastMVC layout (controllers, services, DTOs, Alembic, etc.).
 
         from fast_cli.app import cli, main
 
-    End users run the tool via the installed scripts ``fast-cli`` or ``fastmvc``,
+    End users run the tool via the installed script ``fast`` (or ``fast-cli`` / ``fastmvc``),
     or ``python -m fast_cli``.
 
 See Also

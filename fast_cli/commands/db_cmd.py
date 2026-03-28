@@ -61,9 +61,9 @@ def db_group() -> None:
     Requires Alembic to be installed in your project.
 
     Examples:
-        fastmvc db migrate -m "Add users table"
-        fastmvc db upgrade
-        fastmvc db reset
+        fast db migrate -m "Add users table"
+        fast db upgrade
+        fast db reset
 
     """
     pass
@@ -128,7 +128,7 @@ def db_migrate(message: str, autogenerate: bool) -> None:
                     "[dim]Next steps:[/dim]\n"
                     "  1. Review the generated migration file\n"
                     "  2. Edit if needed (e.g., add data migrations)\n"
-                    "  3. Run [cyan]fastmvc db upgrade[/cyan] to apply",
+                    "  3. Run [cyan]fast db upgrade[/cyan] to apply",
                     title="📝 Review Migration",
                     border_style="blue",
                 )
@@ -475,7 +475,7 @@ def db_status() -> None:
                     f"[bold]Status:[/bold]  [yellow]{len(pending)} pending migration(s)[/yellow]"
                 )
                 output.console.print(
-                    "\n[dim]Run 'fastmvc db upgrade' to apply pending migrations[/dim]"
+                    "\n[dim]Run 'fast db upgrade' to apply pending migrations[/dim]"
                 )
             else:
                 output.console.print(

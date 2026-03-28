@@ -31,8 +31,8 @@ def add_group() -> None:
     context-aware templates that follow framework standards.
 
     Examples:
-        fastmvc add resource user
-        fastmvc add service billing
+        fast add resource --folder user --resource fetch
+        fast add resource -f billing -r create
 
     """
     pass

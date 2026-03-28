@@ -3,3 +3,8 @@
 
 # Development Tools
 pre-commit>=3.0
+rich>=13.0
+fast-platform>=1.5.0
+fast-middleware>=1.5.0
+fast-database>=1.5.0
+fast-dashboards>=1.5.0

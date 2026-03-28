@@ -4,15 +4,14 @@ This folder mirrors the **FastMVC application** repo layout. The **git commit hi
 
 | Path | Purpose |
 |------|---------|
-| **`scripts/git_log_recorder.py`** | In other repos, installed by **`fast-cli setup-commit-log`**; appends to **`commit_history.json`** at the repo root (pre-commit **`post-commit`**). |
+| **`scripts/git_log_recorder.py`** | In other repos, installed by **`fast setup-commit-log`**; appends to **`commit_history.json`** at the repo root (pre-commit **`post-commit`**). |
 
 ## Setup
 
-**Recommended — any repository** (requires `fast-cli` / `fastmvc` on your PATH):
+**Recommended — any repository** (requires **`fast`** on your PATH, or `fast-cli` / `fastmvc`):
 
 ```bash
-fast-cli setup-commit-log
-# or: fastmvc setup-commit-log
+fast setup-commit-log
 ```
 
 This writes `_maint/scripts/git_log_recorder.py`, updates `.pre-commit-config.yaml`, and runs `pre-commit install` when possible.

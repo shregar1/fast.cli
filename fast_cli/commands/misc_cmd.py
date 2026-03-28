@@ -27,7 +27,7 @@ def register_misc_commands(cli: click.Group) -> None:
     @click.argument("type", type=click.Choice(["resource", "env"], case_sensitive=False))
     @click.option("--name", "-n", help="Name of the resource")
     def make(type: str, name: str) -> None:
-        """[DEPRECATED] Use 'fast-cli add' instead."""
+        """[DEPRECATED] Use 'fast add' instead."""
         ctx = click.get_current_context()
         if type.lower() == "resource":
             ctx.invoke(add_resource, folder=name, resource="fetch", version="v1")

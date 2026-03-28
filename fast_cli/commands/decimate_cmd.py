@@ -1,4 +1,4 @@
-"""Remove build and cache artifacts from a tree (``fast-cli decimate``).
+"""Remove build and cache artifacts from a tree (``fast decimate``).
 
 :class:`ArtifactDecimator` walks the filesystem under a root path and deletes
 directories/files matching patterns from :data:`fast_cli.constants.ARTIFACTS_BY_LANGUAGE`.

@@ -35,51 +35,50 @@ from fast_cli.commands.tasks_cmd import tasks_group
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="fast-cli")
+@click.version_option(version=__version__, prog_name="fast")
 def cli() -> None:
-    r"""✨ FastMVC CLI - Beautiful FastAPI Project Generator.
-
-    Generate production-ready FastAPI projects with MVC architecture.
+    r"""✨ FastMVC CLI — FastAPI project generator and tooling.
 
     \b
-    Project Commands:
-        generate    Interactive project generation
-        new         Alias for generate
-        quickstart  Create project with defaults
-        add middleware Scaffold application middleware
-        add auth       Scaffold complete JWT Auth stack
-        add test       Scaffold async Pytest for resource
-        add task       Scaffold background worker task
-        add env        Generate .env from template
-
-     \b
-    DataI Commands:
-        db migrate   Create new migration
-        db upgrade   Apply migrations
-        db downgrade Rollback migrations
-        db reset     Reset dataI (drop & recreate)
-        db status    Check migration status
-        db history   Show migration history
+    Projects:
+        generate, new       Create a project (interactive or --name/--path)
+        quickstart          Create a project with defaults
+        add resource        Scaffold DTOs, services, and API layers
+        env                 Generate .env from .env.example
 
     \b
-    Infrastructure Commands:
-        dockerize    Generate Docker & Docker Compose config
+    Database (Alembic):
+        db migrate          New revision (-m message)
+        db upgrade          Apply migrations
+        db downgrade        Roll back
+        db reset            Drop and recreate (dangerous)
+        db status, history  Inspect state
 
     \b
-    Repository tooling:
-        setup-commit-log  Install commit_history.json recorder in any git repo
+    Docs & ops:
+        docs generate       MkDocs-style API stubs under docs/api/
+        docs deploy         mkdocs gh-deploy
+        cache clear         Clear FastCaching backend (optional dep)
+        cache invalidate    Invalidate cache tags
+        tasks worker        Background worker (fast_platform)
+        tasks list, status, dashboard
 
     \b
-    Documentation Commands:
-        docs generate  Generate API documentation site
+    Cleanup & repo:
+        decimate            Remove build/cache artifacts (python, java, rust, …)
+        setup-commit-log    Commit history JSON + pre-commit post-commit hook
+
+    \b
+    Legacy:
+        make                Deprecated; use add or env
 
     \b
     Examples:
-        fastmvc generate
-        fastmvc new --name my_api
-        fastmvc add resource user
-        fastmvc add auth
-        fastmvc dockerize
+        fast generate
+        fast new --name my_api --path ./my_api
+        fast add resource -f user -r create
+        fast db upgrade
+        fast setup-commit-log
     """
     pass
 
@@ -101,6 +100,7 @@ def main() -> None:
     This function is referenced from ``pyproject.toml``::
 
         [project.scripts]
+        fast = "fast_cli.app:main"
         fast-cli = "fast_cli.app:main"
         fastmvc = "fast_cli.app:main"
 
