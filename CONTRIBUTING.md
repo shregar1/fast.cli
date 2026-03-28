@@ -1,5 +1,7 @@
 # Contributing
 
+New to the tool from a user perspective? Start with **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** (~15 minutes).
+
 ## Quick setup
 
 Clone the repository and install in editable mode with dev dependencies:

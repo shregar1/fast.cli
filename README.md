@@ -4,11 +4,21 @@
 
 Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a separate project you do not control). After install, use the **`fast`** command (shortest), or **`fast-cli`** / **`fastmvc`** scripts — same as before.
 
+## Why FastMVC?
+
+**FastMVC** is opinionated structure for production **FastAPI** apps: controllers, services, DTOs, and migrations live in predictable places so teams spend less time debating folders and more time shipping. This package is the **front door**—**`fast`** scaffolds projects (**`generate`**, **`quickstart`**), adds versioned APIs (**`add resource`**), wraps **Alembic** (**`db`**), and plugs into the optional **`fast-*`** stack (caching, tasks, dashboards) when you need it.
+
+It does **not** replace FastAPI; it **organizes** how you build on it. If you want raw minimalism, use FastAPI alone. If you want **convention + velocity** for backend teams, use FastMVC—and start with **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** (~15 minutes from install to a generated tree).
+
+**[Roadmap](docs/ROADMAP.md)** · **[Examples](examples/README.md)** · **Dev container:** open this repo in VS Code → “Reopen in Container” (see [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json)).
+
 ---
 
 ## Contents
 
+- [Why FastMVC?](#why-fastmvc)
 - [Install](#install)
+- [Getting started (15 min)](docs/GETTING_STARTED.md)
 - [User defaults (`defaults.toml`)](#user-defaults-defaultstoml)
 - [Global options](#global-options)
 - [Terminal environment](#terminal-environment)

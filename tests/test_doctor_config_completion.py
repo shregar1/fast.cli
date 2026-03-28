@@ -200,6 +200,60 @@ def test_doctor_git_missing_from_path(monkeypatch: pytest.MonkeyPatch) -> None:
     r = CliRunner().invoke(cli, ["doctor"])
     assert r.exit_code == 0
     assert "missing" in r.output.lower() or "git" in r.output.lower()
+    assert "suggested" in r.output.lower()
+
+
+def test_doctor_tool_hints() -> None:
+    from fast_cli.commands import doctor_cmd as dc
+
+    git_hint = dc._tool_install_hint("git")
+    assert "git" in git_hint.lower() or "install" in git_hint.lower()
+    assert "pip install alembic" in dc._tool_install_hint("alembic")
+    assert "pre-commit" in dc._tool_install_hint("pre-commit").lower()
+    assert "python" in dc._tool_install_hint("python3").lower()
+    assert "fastmvc-cli" in dc._optional_install_hint("questionary")
+
+
+@pytest.mark.parametrize(
+    ("plat", "needle"),
+    [
+        ("win32", "git-scm.com"),
+        ("darwin", "brew"),
+        ("linux", "apt"),
+    ],
+)
+def test_doctor_git_hint_by_platform(
+    plat: str, needle: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from fast_cli.commands import doctor_cmd as dc
+
+    monkeypatch.setattr("fast_cli.commands.doctor_cmd.sys.platform", plat)
+    assert needle in dc._tool_install_hint("git")
+
+
+def test_doctor_unknown_tool_hint() -> None:
+    from fast_cli.commands import doctor_cmd as dc
+
+    assert "package manager" in dc._tool_install_hint("unknown").lower()
+
+
+def test_doctor_ready_panel_all_green(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "fast_cli.commands.doctor_cmd.shutil.which",
+        lambda _exe: "/mock/bin/tool",
+    )
+    monkeypatch.setattr(
+        "fast_cli.commands.doctor_cmd.importlib.util.find_spec",
+        lambda _mod: object(),
+    )
+    monkeypatch.setattr(
+        "fast_cli.commands.doctor_cmd.metadata.version",
+        lambda _n: "9.9.9",
+    )
+
+    r = CliRunner().invoke(cli, ["doctor"])
+    assert r.exit_code == 0
+    assert "good shape" in r.output.lower()
 
 
 def test_quickstart_applies_cfg_venv_name(
