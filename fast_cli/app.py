@@ -25,6 +25,7 @@ import click
 from fast_cli import __version__
 from fast_cli.commands.add_cmd import add_group
 from fast_cli.commands.cache_cmd import cache_group
+from fast_cli.commands.commit_history_setup import register_commit_history_setup
 from fast_cli.commands.db_cmd import db_group
 from fast_cli.commands.decimate_cmd import register_decimate_command
 from fast_cli.commands.docs_cmd import docs_group
@@ -65,6 +66,10 @@ def cli() -> None:
         dockerize    Generate Docker & Docker Compose config
 
     \b
+    Repository tooling:
+        setup-commit-log  Install commit_history.json recorder in any git repo
+
+    \b
     Documentation Commands:
         docs generate  Generate API documentation site
 
@@ -81,6 +86,7 @@ def cli() -> None:
 
 register_generate_commands(cli)
 register_misc_commands(cli)
+register_commit_history_setup(cli)
 register_decimate_command(cli)
 cli.add_command(docs_group)
 cli.add_command(db_group, name="db")

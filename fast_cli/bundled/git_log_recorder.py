@@ -5,7 +5,6 @@ Logs commit details to commit_history.json in a parsable format.
 
 import json
 import subprocess
-import os
 from typing import List, Dict, Any
 from pathlib import Path
 from datetime import datetime

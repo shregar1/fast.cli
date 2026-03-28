@@ -4,11 +4,20 @@ This folder mirrors the **FastMVC application** repo layout. The **git commit hi
 
 | Path | Purpose |
 |------|---------|
-| **`scripts/git_log_recorder.py`** | Appends the latest commit to **`commit_history.json`** at the repo root (via pre-commit **`post-commit`**). |
+| **`scripts/git_log_recorder.py`** | In other repos, installed by **`fast-cli setup-commit-log`**; appends to **`commit_history.json`** at the repo root (pre-commit **`post-commit`**). |
 
 ## Setup
 
-From the **fast.cli** repo root:
+**Recommended — any repository** (requires `fast-cli` / `fastmvc` on your PATH):
+
+```bash
+fast-cli setup-commit-log
+# or: fastmvc setup-commit-log
+```
+
+This writes `_maint/scripts/git_log_recorder.py`, updates `.pre-commit-config.yaml`, and runs `pre-commit install` when possible.
+
+**Manual — fast.cli repo only:** from the repo root, install hooks after [pre-commit](https://pre-commit.com/) is available:
 
 ```bash
 pip install pre-commit
@@ -16,7 +25,7 @@ pre-commit install
 pre-commit install --hook-type post-commit
 ```
 
-Requires **Python 3** on your PATH (`python3` runs the script).
+Requires **Python 3** on your PATH (`python3` runs the script; the post-commit hook in this repo targets **`fast_cli/bundled/git_log_recorder.py`**).
 
 ## Related repository
 
