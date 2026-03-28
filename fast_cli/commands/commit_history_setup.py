@@ -24,6 +24,14 @@ GIT_LOG_HOOK: dict[str, Any] = {
     "stages": ["post-commit"],
 }
 
+# Appended to the repo ``.gitignore`` by :func:`_ensure_gitignore_entries` when missing.
+GITIGNORE_LINES: tuple[str, ...] = (
+    "coverage_output.txt",
+    "commit_history.json",
+)
+GITIGNORE_MARKER = "# fast-cli setup-commit-log"
+
+
 COMMON_HOOKS_REPO: dict[str, Any] = {
     "repo": "https://github.com/pre-commit/pre-commit-hooks",
     "rev": "v4.5.0",
@@ -152,6 +160,51 @@ def _dump_yaml(data: dict[str, Any]) -> str:
     return dumped
 
 
+def _gitignore_non_comment_lines(text: str) -> set[str]:
+    """Return stripped non-empty, non-comment lines for duplicate detection."""
+    out: set[str] = set()
+    for line in text.splitlines():
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        out.add(s)
+    return out
+
+
+def _ensure_gitignore_entries(root: Path) -> tuple[bool, list[str]]:
+    """Append ``GITIGNORE_LINES`` to ``.gitignore`` when not already listed.
+
+    Returns
+    -------
+    changed
+        Whether the file was modified.
+    added
+        Basenames that were appended (may be empty if nothing to do).
+    """
+    path = root / ".gitignore"
+    content = path.read_text(encoding="utf-8") if path.exists() else ""
+    present = _gitignore_non_comment_lines(content)
+    missing = [line for line in GITIGNORE_LINES if line not in present]
+    if not missing:
+        return False, []
+
+    parts: list[str] = []
+    if content and not content.endswith("\n"):
+        parts.append("\n")
+    elif content:
+        parts.append("\n")
+    if GITIGNORE_MARKER not in content:
+        parts.append(f"{GITIGNORE_MARKER}\n")
+    for line in missing:
+        parts.append(f"{line}\n")
+    try:
+        path.write_text(content + "".join(parts), encoding="utf-8")
+    except OSError as e:
+        output.print_warning(f"Could not update .gitignore: {e}")
+        return False, []
+    return True, missing
+
+
 def _install_pre_commit_hooks(repo: Path) -> tuple[bool, str | None]:
     """Run ``pre-commit install`` and ``post-commit`` installs. Returns (ok, stderr_or_none)."""
     try:
@@ -244,6 +297,10 @@ def register_commit_history_setup(cli: click.Group) -> None:
             output.print_success(f".pre-commit-config.yaml {desc}")
         else:
             output.print_info(f".pre-commit-config.yaml: git-log-recorder hook {desc}")
+
+        gi_changed, gi_added = _ensure_gitignore_entries(root)
+        if gi_changed:
+            output.print_success(f"Updated .gitignore ({', '.join(gi_added)})")
 
         if install_hooks:
             ok, err = _install_pre_commit_hooks(root)

@@ -107,6 +107,30 @@ def test_git_toplevel_none(tmp_path: Path) -> None:
     assert chs._git_toplevel(tmp_path / "nope") is None
 
 
+def test_ensure_gitignore_appends_missing(tmp_path: Path) -> None:
+    changed, added = chs._ensure_gitignore_entries(tmp_path)
+    assert changed and set(added) == {
+        "coverage_output.txt",
+        "commit_history.json",
+    }
+    text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert chs.GITIGNORE_MARKER in text
+    assert "coverage_output.txt" in text
+    assert "commit_history.json" in text
+
+
+def test_ensure_gitignore_idempotent(tmp_path: Path) -> None:
+    chs._ensure_gitignore_entries(tmp_path)
+    changed, added = chs._ensure_gitignore_entries(tmp_path)
+    assert not changed and added == []
+
+
+def test_ensure_gitignore_partial_existing(tmp_path: Path) -> None:
+    (tmp_path / ".gitignore").write_text("coverage_output.txt\n", encoding="utf-8")
+    changed, added = chs._ensure_gitignore_entries(tmp_path)
+    assert changed and added == ["commit_history.json"]
+
+
 def test_setup_commit_log_integration(git_repo: Path) -> None:
     runner = CliRunner()
     r = runner.invoke(
