@@ -38,7 +38,36 @@ dependencies = [
 
 [project.optional-dependencies]
 interactive = ["questionary>=2.0"]
-dev = ["pre-commit>=3.0"]
+dev = [
+    "pre-commit>=3.0",
+    "pytest>=8.0",
+    "pytest-cov>=4.0",
+    "pytest-mock>=3.0",
+    "questionary>=2.0",
+]
+all = [
+    "fast-cli[interactive,dev]",
+    "fast-platform[all]",
+    "fast-middleware",
+    "fast-database",
+    "fast_dashboards",
+    "fast-mvc[all,dev,docs,interactive]",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=fast_cli --cov-report=term-missing --cov-fail-under=99"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["fast_cli"]
+branch = false
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
 
 [project.urls]
 Homepage = "https://github.com/fastmvc/fast.cli"
