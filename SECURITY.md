@@ -11,6 +11,12 @@ We aim to fix security issues in the **latest minor release** on the default bra
 
 Older releases may not receive backports unless we explicitly say otherwise.
 
+## Dependency and supply-chain posture
+
+- **Runtime dependencies** (`fast-*`, `click`, `rich`, …) are installed from **PyPI** (or your configured index). Version ranges are declared in `pyproject.toml`; see [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md) for trust boundaries and pinning guidance.
+- **Builds** use **Hatch**; **wheels** are published via **GitHub Actions** and **PyPI trusted publishing (OIDC)**—no long-lived PyPI token stored in the repo (see [.github/workflows/publish-pypi.yml](.github/workflows/publish-pypi.yml)).
+- **GitHub Actions** use tagged action versions; updates are proposed via **Dependabot** where configured.
+
 ## Reporting a vulnerability
 
 **Please do not** open a public GitHub issue for undisclosed security bugs.
@@ -24,7 +30,11 @@ Include:
 - Steps to reproduce (or a proof-of-concept)
 - Affected versions / components, if known
 
-We will acknowledge receipt and work on a fix and disclosure timeline. Credit for responsible disclosure can be discussed when the issue is resolved.
+### Response expectations
+
+- **Acknowledgment:** We aim to acknowledge receipt within a few business days (not a legal SLA).
+- **Triage:** We will assess severity and scope; we may ask follow-up questions.
+- **Disclosure:** We coordinate a fix release and, when appropriate, a GitHub Security Advisory with credit for responsible disclosure.
 
 ## General bug reports
 

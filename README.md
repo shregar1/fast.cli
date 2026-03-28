@@ -11,6 +11,7 @@ Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a sep
 - [Install](#install)
 - [User defaults (`defaults.toml`)](#user-defaults-defaultstoml)
 - [Global options](#global-options)
+- [Terminal environment](#terminal-environment)
 - [Command map](#command-map)
 - [Project generation](#project-generation)
 - [Scaffolding (`add`)](#scaffolding-add)
@@ -27,6 +28,8 @@ Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a sep
 - [Publishing to PyPI](#publishing-to-pypi)
 - [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
+- [Releasing](RELEASING.md) (maintainers: tags, PyPI, rollback)
+- [Dependencies & supply chain](docs/DEPENDENCIES.md)
 - [Security](SECURITY.md)
 
 ---
@@ -83,6 +86,15 @@ Discover everything at once:
 fast --help
 fast <command> --help
 ```
+
+### Terminal environment
+
+| Variable | Effect |
+|----------|--------|
+| `NO_COLOR` | Disables color ([standard](https://no-color.org/)); Rich respects it. |
+| `TERM=dumb` | Minimal capability terminal (colors/styles may be reduced). |
+| `FAST_CLI_MINIMAL_BANNER` | Set to `1` / `true` / `yes` for a short text banner instead of the large ASCII wordmark. |
+| `COLUMNS` | Terminal width; when very narrow (&lt; 56 columns), a compact banner is used automatically. |
 
 ---
 
@@ -382,6 +394,8 @@ This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](ht
 ## Publishing to PyPI
 
 The PyPI project name is **`fastmvc-cli`** (`name` in `pyproject.toml`). Create it under your PyPI account on first successful upload. Bump **`__version__`** in `fast_cli/__init__.py` before each release.
+
+**Maintainer checklist** (tags, CI, wheel smoke test, rollback): **[RELEASING.md](RELEASING.md)**.
 
 ### Troubleshooting uploads
 

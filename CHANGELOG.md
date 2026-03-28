@@ -9,10 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- GitHub Actions CI: **`test`** job (pytest + coverage on PRs / pushes to `main` / `master`).
-- GitHub Actions **`lint`** job (**Ruff** + **Mypy**).
-- `CHANGELOG.md` in **`[project.urls]`**; **`py.typed`** (PEP 561).
-- `CONTRIBUTING.md`, `SECURITY.md`, Dependabot (weekly `pip` + GitHub Actions), expanded PyPI troubleshooting in README.
+- **RELEASING.md** — Maintainer release checklist, PyPI verification, rollback (yank / patch).
+- **docs/DEPENDENCIES.md** — Trust boundaries and pinning guidance for the `fast-*` stack.
+- **CI** — **`smoke`** job (Linux + Windows, Python 3.11–3.12) running subprocess CLI tests (`tests/test_smoke_cli.py`) with `--no-cov`.
+- **Publish workflow** — Runs the full test suite before build; **smoke-installs** the built wheel then uploads to PyPI.
+- **Terminal UX** — Compact banner when `FAST_CLI_MINIMAL_BANNER=1` or terminal width `< 56` columns; ASCII-friendly subtitle when stdout encoding is ASCII; tests in `tests/test_terminal_output.py`.
+
+### Changed
+
+- **SECURITY.md** — Supply-chain notes, dependency posture, and response expectations.
 
 ## [1.5.0] — 2026-03-28
 

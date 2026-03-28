@@ -24,7 +24,25 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+
+      - name: Run tests (same as CI)
+        run: python -m pytest
+
   publish:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +56,14 @@ jobs:
 
       - name: Build sdist and wheel
         run: python -m build
+
+      - name: Smoke-test wheel in clean venv
+        run: |
+          python -m venv .venv-smoke
+          .venv-smoke/bin/pip install --upgrade pip
+          .venv-smoke/bin/pip install dist/*.whl
+          .venv-smoke/bin/python -m fast_cli.app --help
+          .venv-smoke/bin/python -m fast_cli.app doctor
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

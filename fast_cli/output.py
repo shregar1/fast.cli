@@ -14,6 +14,9 @@ output : CliOutput
 
 from __future__ import annotations
 
+import os
+import sys
+
 from rich import box
 from rich.align import Align
 from rich.console import Console
@@ -43,6 +46,26 @@ _C_BORDER = "#38bdf8"
 _C_TITLE = "#f8fafc"
 
 
+def _env_flag(name: str) -> bool:
+    v = os.environ.get(name, "").strip().lower()
+    return v in ("1", "true", "yes", "on")
+
+
+def _ascii_stdout() -> bool:
+    enc = getattr(sys.stdout, "encoding", None) or ""
+    return enc.lower() in ("ascii", "ansi_x3.4-1968")
+
+
+def _use_compact_banner(console: Console) -> bool:
+    """Prefer a short banner for narrow terminals, CI logs, or explicit opt-in."""
+    if _env_flag("FAST_CLI_MINIMAL_BANNER"):
+        return True
+    w = console.width
+    if w and w < 56:
+        return True
+    return False
+
+
 class CliOutput:
     """Facade for banners, status lines, and the shared Rich ``Console``.
 
@@ -52,8 +75,10 @@ class CliOutput:
 
     Notes
     -----
-    * :meth:`print_banner` uses a gradient wordmark; it assumes a reasonably
-      wide terminal (~72+ columns) for best results.
+    * :meth:`print_banner` uses a gradient wordmark on wide terminals; set
+      ``FAST_CLI_MINIMAL_BANNER=1`` or use a narrow terminal (``< 56`` columns)
+      for a short text banner. ``NO_COLOR`` / ``TERM=dumb`` are respected via
+      Rich (see Rich console docs).
     * Error paths should use :meth:`print_error`; avoid raising without user-facing
       text when the failure is expected (missing optional deps, etc.).
     """
@@ -63,8 +88,24 @@ class CliOutput:
     def __init__(self) -> None:
         self.console = Console()
 
+    def _print_banner_compact(self) -> None:
+        """Plain banner for small terminals, dumb TERM, or ASCII-only streams."""
+        sub = (
+            "FastAPI / MVC / Production-ready"
+            if _ascii_stdout()
+            else "FastAPI · MVC · Production-ready"
+        )
+        self.console.print()
+        self.console.print(Align.center(Text("FastMVC CLI", style="bold")))
+        self.console.print(Align.center(Text(sub, style="dim")))
+        self.console.print()
+
     def print_banner(self) -> None:
         """Render the FastMVC wordmark with a soft cyan→violet gradient."""
+        if _use_compact_banner(self.console):
+            self._print_banner_compact()
+            return
+
         raw_lines = [
             r"  ███████╗ █████╗ ███████╗████████╗ ███╗   ███╗██╗   ██╗ ██████╗",
             r"  ██╔════╝██╔══██╗██╔════╝╚══██╔══╝ ████╗ ████║██║   ██║██╔════╝",

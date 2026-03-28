@@ -35,18 +35,14 @@ pre-commit install
 
 ## Cutting a release
 
-1. Update **`__version__`** in **`fast_cli/__init__.py`** (and refresh **`CHANGELOG.md`**).
-2. Commit and push.
-3. Tag with a **`v`** prefix matching the version, e.g. **`v1.5.1`** if the version is `1.5.1`:
+Short version:
 
-   ```bash
-   git tag v1.5.1
-   git push origin v1.5.1
-   ```
+1. Update **`__version__`** in **`fast_cli/__init__.py`** (and **`CHANGELOG.md`**).
+2. Tag **`vX.Y.Z`** and push the tag; **publish-pypi.yml** runs tests, smoke-installs the wheel, then uploads to PyPI (trusted publishing).
 
-4. **PyPI:** If the repo uses [trusted publishing](https://docs.pypi.org/trusted-publishers/), **`.github/workflows/publish-pypi.yml`** uploads on tag push. Otherwise publish manually with `python -m build` and `twine upload` (see README).
+Full checklist, PyPI verification, rollback (yank / patch), and local dry run: **[RELEASING.md](RELEASING.md)**.
 
-The tag and **`fast_cli.__version__`** should match.
+The tag and **`fast_cli.__version__`** must match.
 
 ## Code style
 
