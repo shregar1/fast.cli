@@ -38,10 +38,11 @@ class GenerationSummaryPresenter:
     def show_summary_table(self, context: dict) -> None:
         """Render the “Project Configuration” table before final confirmation."""
         table = Table(
-            title="📋 Project Configuration",
+            title="📋 Project configuration",
             box=box.ROUNDED,
             show_header=True,
-            header_style="bold cyan",
+            header_style="bold #38bdf8",
+            border_style="dim #334155",
         )
         table.add_column("Setting", style="dim", width=20)
         table.add_column("Value", style="bold")
@@ -80,9 +81,17 @@ class GenerationSummaryPresenter:
         venv_svc = VirtualEnvironmentService()
 
         output.console.print(
-            Rule("[bold green]🎉 Project Generated Successfully![/bold green]")
+            Rule(
+                "[bold #34d399]🎉 Project generated successfully[/bold #34d399]",
+                style="dim #475569",
+                characters="─",
+            )
         )
-        output.console.print(f"\n[bold]📂 Location:[/bold] [cyan]{target_path}[/cyan]\n")
+        output.console.print()
+        output.console.print(
+            f"[bold #f8fafc]📂[/bold #f8fafc] [bold]Location[/bold]  [bold #38bdf8]{target_path}[/bold #38bdf8]"
+        )
+        output.console.print()
 
         if venv_created:
             output.console.print(
@@ -225,4 +234,6 @@ app.include_router(item_router)
 # PATCH  /items/{id}     - Update item
 # DELETE /items/{id}     - Delete item"""
         output.console.print(Syntax(code, "python", theme="monokai", line_numbers=True))
-        output.console.print("\n[dim]Happy coding with FastMVC! 🚀[/dim]\n")
+        output.console.print(
+            "\n[italic dim #94a3b8]Happy coding with FastMVC · ship something great[/italic dim #94a3b8]\n"
+        )

@@ -36,7 +36,12 @@ from fast_cli.commands.misc_cmd import register_misc_commands
 from fast_cli.commands.tasks_cmd import tasks_group
 
 
-@click.group()
+@click.group(
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "max_content_width": 92,
+    },
+)
 @click.version_option(version=__version__, prog_name="fast")
 def cli() -> None:
     r"""✨ FastMVC CLI — FastAPI project generator and tooling.

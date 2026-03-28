@@ -227,7 +227,13 @@ class ProjectGenerationOrchestrator:
             "app_port": "8000",
         }
 
-        output.console.print(Rule("[bold cyan]Configuration Summary[/bold cyan]"))
+        output.console.print(
+            Rule(
+                "[bold #38bdf8]Configuration summary[/bold #38bdf8]",
+                style="dim #475569",
+                characters="─",
+            )
+        )
         self._ui.show_summary_table(context)
         if not questionary.confirm(
             "Generate project with these settings?", default=True
@@ -235,7 +241,13 @@ class ProjectGenerationOrchestrator:
             output.print_error("Cancelled.")
             return
 
-        output.console.print(Rule("[bold green]Generating Project[/bold green]"))
+        output.console.print(
+            Rule(
+                "[bold #34d399]Generating project[/bold #34d399]",
+                style="dim #475569",
+                characters="─",
+            )
+        )
         try:
             self._execute_pipeline(target_path, context)
         except Exception as e:

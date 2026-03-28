@@ -8,6 +8,7 @@ import sys
 from importlib import metadata
 
 import click
+from rich.rule import Rule
 from rich.table import Table
 
 from fast_cli import __version__
@@ -26,13 +27,25 @@ def register_doctor_commands(cli: click.Group) -> None:
 
     def _run() -> None:
         output.print_banner()
-        output.console.print("\n[bold cyan]Environment[/bold cyan]\n")
+        output.console.print(
+            Rule(
+                "[bold #38bdf8]Environment[/bold #38bdf8]",
+                style="dim #475569",
+                characters="─",
+            )
+        )
+        output.console.print()
         output.console.print(f"  [dim]fast_cli[/dim]  {__version__}")
         output.console.print(
             f"  [dim]python[/dim]  {sys.version.split()[0]} ({sys.executable})"
         )
 
-        table = Table(title="Tools (PATH)", show_header=True, header_style="bold")
+        table = Table(
+            title="Tools (PATH)",
+            show_header=True,
+            header_style="bold #38bdf8",
+            border_style="dim #334155",
+        )
         table.add_column("Name")
         table.add_column("Status")
         table.add_column("Path or note")
@@ -50,7 +63,12 @@ def register_doctor_commands(cli: click.Group) -> None:
         output.console.print()
         output.console.print(table)
 
-        opt_table = Table(title="Optional Python packages", show_header=True)
+        opt_table = Table(
+            title="Optional Python packages",
+            show_header=True,
+            header_style="bold #a78bfa",
+            border_style="dim #334155",
+        )
         opt_table.add_column("Import")
         opt_table.add_column("Status")
         opt_table.add_column("Version")
