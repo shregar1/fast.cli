@@ -25,7 +25,7 @@ See **`_maint/README.md`** for details.
 
 ```
 fast.cli/
-├── _maint/scripts/     # git_log_recorder.py → GIT_METADATA.json
+├── _maint/scripts/     # git_log_recorder.py → commit_history.json
 ├── .pre-commit-config.yaml
 └── …
 ```

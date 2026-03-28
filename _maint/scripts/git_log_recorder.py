@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Git Log Recorder - Captured commit metadata for FastMVC.
-Logs commit details to GIT_METADATA.json in a parsable format.
+Logs commit details to commit_history.json in a parsable format.
 """
 
 import json
@@ -9,6 +9,18 @@ import os
 from typing import List, Dict, Any
 from pathlib import Path
 from datetime import datetime
+
+
+def get_repo_root() -> Path | None:
+    """Resolve the git work tree root (works from any subdirectory)."""
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            stderr=subprocess.DEVNULL,
+        ).decode("utf-8").strip()
+        return Path(out) if out else None
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return None
 
 
 def get_git_info():
@@ -51,12 +63,19 @@ def main():
     Returns:
         The result of the operation.
     """
-    root_path = Path.cwd()
-    # Ensure we are in the root (might need to traverse up if run from hook)
-    if not (root_path / ".git").exists() and (root_path.parent / ".git").exists():
-        root_path = root_path.parent
+    root_path = get_repo_root()
+    if not root_path:
+        print("Error: not a git repository (or git is not available).")
+        return
 
-    log_file = root_path / "GIT_METADATA.json"
+    log_file = root_path / "commit_history.json"
+    legacy = root_path / "GIT_METADATA.json"
+    if not log_file.exists() and legacy.exists():
+        try:
+            legacy.rename(log_file)
+        except OSError:
+            pass
+
     metadata = get_git_info()
 
     if not metadata:
@@ -84,7 +103,7 @@ def main():
         with open(log_file, "w") as f:
             json.dump(processed_logs, f, indent=2)
 
-        print(f"  [cyan]●[/cyan] Commit logged to {log_file.name}")
+        print(f"  ● Commit logged to {log_file}")
 
 
 if __name__ == "__main__":

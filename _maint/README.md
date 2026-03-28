@@ -4,7 +4,7 @@ This folder mirrors the **FastMVC application** repo layout. The **git commit hi
 
 | Path | Purpose |
 |------|---------|
-| **`scripts/git_log_recorder.py`** | Appends the latest commit to **`GIT_METADATA.json`** at the repo root (via pre-commit **`post-commit`**). |
+| **`scripts/git_log_recorder.py`** | Appends the latest commit to **`commit_history.json`** at the repo root (via pre-commit **`post-commit`**). |
 
 ## Setup
 
