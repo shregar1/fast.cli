@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fast-cli"
+name = "fastmvc-cli"
 dynamic = ["version"]
 description = "FastMVC CLI — interactive FastAPI project generator and tooling"
 readme = "README.md"
@@ -44,9 +44,11 @@ dev = [
     "pytest-cov>=4.0",
     "pytest-mock>=3.0",
     "questionary>=2.0",
+    "build>=1.2",
+    "twine>=5.0",
 ]
 all = [
-    "fast-cli[interactive,dev]",
+    "fastmvc-cli[interactive,dev]",
     "fast-platform[all]",
     "fast-middleware",
     "fast-database",
@@ -86,6 +88,7 @@ packages = ["fast_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
+    "/pyproject.toml",
     "/fast_cli",
     "/README.md",
     "/LICENSE",

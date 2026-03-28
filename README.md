@@ -1,8 +1,8 @@
-# fast-cli
+# fastmvc-cli
 
 **FastMVC CLI** — a console toolkit for generating FastAPI / FastMVC projects, scaffolding APIs, running database migrations, and maintaining a few operational utilities.
 
-Use the **`fast`** command (shortest). The same program is also available as **`fast-cli`** and **`fastmvc`** for compatibility.
+Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a separate project you do not control). After install, use the **`fast`** command (shortest), or **`fast-cli`** / **`fastmvc`** scripts — same as before.
 
 ---
 
@@ -23,25 +23,26 @@ Use the **`fast`** command (shortest). The same program is also available as **`
 - [Legacy (`make`)](#legacy-make)
 - [Related repositories](#related-repositories)
 - [Layout](#layout)
+- [Publishing to PyPI](#publishing-to-pypi)
 
 ---
 
 ## Install
 
 ```bash
-pip install fast-cli
+pip install fastmvc-cli
 ```
 
 Interactive prompts (wizard-style flows) use **Questionary**. Install it for the full experience:
 
 ```bash
-pip install "fast-cli[interactive]"
+pip install "fastmvc-cli[interactive]"
 ```
 
 For development and tests:
 
 ```bash
-pip install "fast-cli[dev]"
+pip install "fastmvc-cli[dev]"
 ```
 
 Requires **Python 3.10+**.
@@ -350,7 +351,56 @@ Deprecated. Use **`add`** or **`env`** instead.
 | **FastMVC framework** (sibling checkout) | `../fast_mvc` |
 | **GitHub** | [github.com/shregar1/fast.mvc](https://github.com/shregar1/fast.mvc) |
 
-This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](https://github.com/fastmvc/fast.cli) as the canonical home for **`fast-cli`** on PyPI.
+This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](https://github.com/fastmvc/fast.cli). The PyPI distribution is **`fastmvc-cli`**.
+
+---
+
+## Publishing to PyPI
+
+The PyPI project name is **`fastmvc-cli`** (`name` in `pyproject.toml`). Create it under your PyPI account on first successful upload. Bump **`__version__`** in `fast_cli/__init__.py` before each release.
+
+If you see **`403 Forbidden`** and a message like *isn’t allowed to upload to project `some-name`*: that PyPI project already exists and belongs to someone else, or your token is not scoped for it. Use a distribution name you own (this repo uses **`fastmvc-cli`**) or ask the project owner to add you as a maintainer.
+
+Publishing uses a **PyPI API token** only (no password login). Create one under [PyPI → Account settings → API tokens](https://pypi.org/manage/account/token/).
+
+### Local build and upload
+
+Install build tools (included in the **`dev`** extra):
+
+```bash
+pip install "fastmvc-cli[dev]"   # or: pip install build twine
+python -m build               # writes dist/fast_cli-*.tar.gz and .whl
+twine check dist/*
+```
+
+Upload with your token. The username must be exactly **`__token__`**; the password is the **full token** (including the `pypi-` prefix):
+
+```bash
+export TWINE_USERNAME=__token__
+export TWINE_PASSWORD='pypi-AgEIcHlwaS5vcmc...'   # paste your token
+twine upload dist/*
+```
+
+On one line:
+
+```bash
+TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-…' twine upload dist/*
+```
+
+Never commit the token or add it to the repo—use shell exports, a password manager, or CI secrets only.
+
+### GitHub Actions
+
+The workflow **`.github/workflows/publish-pypi.yml`** runs when you push a tag matching **`v*`** (for example `v1.5.1`).
+
+Add a repository secret **`PYPI_API_TOKEN`** whose value is your **token string** (same value you would put in `TWINE_PASSWORD`). Then:
+
+```bash
+git tag v1.5.1
+git push origin v1.5.1
+```
+
+The tag should match the version in `fast_cli/__init__.py`.
 
 ---
 

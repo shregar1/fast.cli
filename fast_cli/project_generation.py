@@ -95,7 +95,7 @@ class ProjectGenerationOrchestrator:
             output.console.print(
                 Panel(
                     "[yellow]For the best experience, install with:[/yellow]\n"
-                    "[bold]pip install fast-cli[interactive][/bold]",
+                    "[bold]pip install fastmvc-cli[interactive][/bold]",
                     title="💡 Tip",
                     border_style="yellow",
                 )
