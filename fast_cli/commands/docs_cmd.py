@@ -45,7 +45,7 @@ class MkdocsStyleReferenceGenerator:
         dto_doc_path = self._root / "docs" / "api" / "dtos.md"
         api_doc_path.parent.mkdir(parents=True, exist_ok=True)
 
-        output.console.print(f"\n[bold cyan]📚 Generating Documentation:[/bold cyan]\n")
+        output.console.print("\n[bold cyan]📚 Generating Documentation:[/bold cyan]\n")
 
         self._write_api_endpoints(api_doc_path)
         self._write_dto_reference(dto_doc_path)
@@ -186,7 +186,7 @@ def generate_docs() -> None:
 def deploy_docs(message: str) -> None:
     """🚀 Deploy documentation to GitHub Pages."""
     output.print_banner()
-    output.console.print(f"\n[bold cyan]🚀 Deploying to GitHub Pages:[/bold cyan]\n")
+    output.console.print("\n[bold cyan]🚀 Deploying to GitHub Pages:[/bold cyan]\n")
     try:
         subprocess.run(["mkdocs", "gh-deploy", "--message", message], check=True)
         output.print_success("Documentation deployed successfully to GitHub Pages!")

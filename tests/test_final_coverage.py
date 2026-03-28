@@ -10,7 +10,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-
 from fast_cli.app import cli
 from fast_cli.commands import commit_history_setup as chs
 

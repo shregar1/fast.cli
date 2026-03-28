@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from fast_cli.bundled import git_log_recorder as glr
 
 

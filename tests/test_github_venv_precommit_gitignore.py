@@ -6,10 +6,8 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from fast_cli.gitignore import GitignoreUpdater
 from fast_cli.github_workflows import GitHubWorkflowsCopier
+from fast_cli.gitignore import GitignoreUpdater
 from fast_cli.precommit import PreCommitInstaller
 from fast_cli.venv import VirtualEnvironmentService
 

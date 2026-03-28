@@ -34,6 +34,9 @@ def add_group() -> None:
         fast add resource --folder user --resource fetch
         fast add resource -f billing -r create
 
+    Other ``add`` subcommands (middleware, auth, test) print guidance only;
+    templates are not bundled in this package.
+
     """
     pass
 
@@ -271,3 +274,41 @@ def add_resource(folder: str, resource: str, version: str, crud: bool) -> None:
         raise click.Abort()
 
     ResourceScaffolder(target_path).run(folder, resource, api_version, crud)
+
+
+@add_group.command(name="middleware")
+def add_middleware() -> None:
+    """Middleware scaffolding (templates not bundled in fastmvc-cli)."""
+    output.print_banner()
+    output.print_warning(
+        "Middleware scaffolding is not bundled in this package."
+    )
+    output.print_info(
+        "Use the FastMVC (fast_mvc) framework repo as reference, or extend "
+        "``middlewares/`` manually."
+    )
+
+
+@add_group.command(name="auth")
+def add_auth() -> None:
+    """JWT / auth stack scaffolding (templates not bundled in fastmvc-cli)."""
+    output.print_banner()
+    output.print_warning(
+        "A full auth stack is not bundled in this package."
+    )
+    output.print_info(
+        "Copy patterns from the FastMVC application template or implement auth "
+        "in your ``services/`` and ``apis/`` layers."
+    )
+
+
+@add_group.command(name="test")
+def add_test() -> None:
+    """Async pytest scaffolding for a resource (templates not bundled)."""
+    output.print_banner()
+    output.print_warning(
+        "Resource test scaffolding is not bundled in this package."
+    )
+    output.print_info(
+        "Add tests under ``tests/`` following your FastMVC project conventions."
+    )

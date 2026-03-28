@@ -9,6 +9,7 @@ Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a sep
 ## Contents
 
 - [Install](#install)
+- [User defaults (`defaults.toml`)](#user-defaults-defaultstoml)
 - [Global options](#global-options)
 - [Command map](#command-map)
 - [Project generation](#project-generation)
@@ -24,6 +25,9 @@ Install from PyPI as **`fastmvc-cli`** (the name **`fast-cli`** on PyPI is a sep
 - [Related repositories](#related-repositories)
 - [Layout](#layout)
 - [Publishing to PyPI](#publishing-to-pypi)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security](SECURITY.md)
 
 ---
 
@@ -49,6 +53,23 @@ Requires **Python 3.10+**.
 
 ---
 
+## User defaults (`defaults.toml`)
+
+Optional file: **`~/.config/fastmvc/defaults.toml`** (or **`$XDG_CONFIG_HOME/fastmvc/defaults.toml`**). Example:
+
+```toml
+[defaults]
+author = "Ada Lovelace"
+author_email = "ada@example.com"
+email = "ada@example.com"          # alias for author_email
+description = "My default blurb"
+venv_name = ".venv"
+```
+
+These values are merged into **`generate`** / **`new`** (non-interactive and interactive), **`quickstart`**, and **`run_basic`** when no better value is supplied.
+
+---
+
 ## Global options
 
 | Option | Description |
@@ -71,6 +92,7 @@ fast <command> --help
 |------|---------|---------|
 | **Projects** | `generate`, `new`, `quickstart` | Create a new FastMVC-style project (interactive or flags). |
 | **Scaffold** | `add resource` | Add a versioned API operation (DTOs, repo, service, controllers). |
+| **Scaffold (info)** | `add middleware`, `add auth`, `add test` | Print guidance only (templates not bundled in this package). |
 | **Env** | `env` | Generate `.env` from `.env.example` in the current project. |
 | **DB** | `db migrate`, `upgrade`, `downgrade`, `reset`, `history`, `status` | Alembic wrappers (run from a directory with `alembic.ini`). |
 | **Docs** | `docs generate`, `docs deploy` | Generate MkDocs-style reference stubs; deploy with `mkdocs gh-deploy`. |
@@ -78,6 +100,8 @@ fast <command> --help
 | **Tasks** | `tasks worker`, `list`, `status`, `dashboard` | FastTasks / `fast_platform` workers (optional). |
 | **Cleanup** | `decimate` | Delete build/cache artifacts under a path. |
 | **Repo tooling** | `setup-commit-log` | Install commit-history recorder + pre-commit hook in any git repo. |
+| **Diagnostics** | `doctor`, `check-env` | Python version, PATH tools (git, alembic, pre-commit), optional deps. |
+| **Shell** | `completion bash|zsh|fish` | Print Click 8 tab-completion script (requires `fast` on PATH). |
 | **Legacy** | `make` | Deprecated; forwards to `add` or `env`. |
 
 ---
@@ -359,9 +383,17 @@ This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](ht
 
 The PyPI project name is **`fastmvc-cli`** (`name` in `pyproject.toml`). Create it under your PyPI account on first successful upload. Bump **`__version__`** in `fast_cli/__init__.py` before each release.
 
-If you see **`403 Forbidden`** and a message like *isn’t allowed to upload to project `some-name`*: that PyPI project already exists and belongs to someone else, or your token is not scoped for it. Use a distribution name you own (this repo uses **`fastmvc-cli`**) or ask the project owner to add you as a maintainer.
+### Troubleshooting uploads
 
-Publishing uses a **PyPI API token** only (no password login). Create one under [PyPI → Account settings → API tokens](https://pypi.org/manage/account/token/).
+If you see **`403 Forbidden`** and a message like *isn’t allowed to upload to project `some-name`*:
+
+- The **PyPI project name** may already exist and be owned by another account (pick a name you control — this repo publishes **`fastmvc-cli`**, not **`fast-cli`**).
+- Your **API token** may be scoped to a **different** PyPI project or to the account without permission for this project. Create a token **scoped to `fastmvc-cli`** (or use an **entire-account** token) under [API tokens](https://pypi.org/manage/account/token/), and retry.
+- **Trusted publishing** (GitHub Actions) does not use a token; ensure the **pending publisher** on PyPI matches this repo and **`publish-pypi.yml`**.
+
+Ask the maintainer of the target project to add you as a collaborator if you need to upload to their package.
+
+**GitHub Actions** uses [trusted publishing](https://docs.pypi.org/trusted-publishers/) (OpenID Connect) — no PyPI token stored in the repo. **Local** uploads still use a [PyPI API token](https://pypi.org/manage/account/token/) with Twine.
 
 ### Local build and upload
 
@@ -387,20 +419,22 @@ On one line:
 TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-…' twine upload dist/*
 ```
 
-Never commit the token or add it to the repo—use shell exports, a password manager, or CI secrets only.
+Never commit the token or add it to the repo—use shell exports or a password manager.
 
-### GitHub Actions
+### GitHub Actions (trusted publishing)
 
-The workflow **`.github/workflows/publish-pypi.yml`** runs when you push a tag matching **`v*`** (for example `v1.5.1`).
+The workflow **`.github/workflows/publish-pypi.yml`** runs when you push a tag matching **`v*`** (for example `v1.5.1`). It publishes with **OIDC** (`id-token: write`); you do **not** need a **`PYPI_API_TOKEN`** secret for this path.
 
-Add a repository secret **`PYPI_API_TOKEN`** whose value is your **token string** (same value you would put in `TWINE_PASSWORD`). Then:
+**One-time:** In PyPI → your project → **Manage** → **Publishing** → add a **pending publisher**: type **GitHub**, set the repository and workflow file **`publish-pypi.yml`**, and save. See [PyPI: adding a GitHub publisher](https://docs.pypi.org/trusted-publishers/adding-a-publisher/).
+
+Then:
 
 ```bash
 git tag v1.5.1
 git push origin v1.5.1
 ```
 
-The tag should match the version in `fast_cli/__init__.py`.
+The tag should match **`__version__`** in `fast_cli/__init__.py`.
 
 ---
 

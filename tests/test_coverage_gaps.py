@@ -5,13 +5,13 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import types
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import click
 import pytest
 from click.testing import CliRunner
-
 from fast_cli.app import cli
 from fast_cli.bundled import git_log_recorder as glr
 from fast_cli.commands import commit_history_setup as chs
@@ -199,6 +199,174 @@ def test_commit_history_merge_local_bad_hooks_type(tmp_path: Path) -> None:
     p.write_text("repos:\n  - repo: local\n    hooks: null\n")
     w, desc = chs._write_pre_commit_config(p, with_common_hooks=False)
     assert w
+
+
+def test_app_main_block() -> None:
+    import runpy
+
+    root = Path(__file__).resolve().parents[1]
+    p = root / "fast_cli" / "app.py"
+    with patch.object(sys, "argv", ["fast", "--help"]):
+        with pytest.raises(SystemExit) as exc:
+            runpy.run_path(str(p), run_name="__main__")
+        assert exc.value.code == 0
+
+
+def test_cache_clear_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_caching" or name.startswith("fast_caching."):
+            raise ImportError("no fast_caching")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_caching" or k.startswith("fast_caching."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["cache", "clear"])
+    assert r.exit_code == 0
+    assert "fast_caching" in r.output.lower()
+
+
+def test_cache_invalidate_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_caching" or name.startswith("fast_caching."):
+            raise ImportError("no fast_caching")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_caching" or k.startswith("fast_caching."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["cache", "invalidate", "tag1"])
+    assert r.exit_code == 0
+    assert "fast_caching" in r.output.lower()
+
+
+def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> None:
+    m = types.ModuleType("fast_platform.src.task")
+
+    class TaskRegistry:
+        @staticmethod
+        def all_tasks() -> dict[str, object]:
+            return {"t1": object()}
+
+    class Backend:
+        async def get_result(self, name: str) -> MagicMock:
+            r = MagicMock()
+            r.status = "ok"
+            return r
+
+    ft = MagicMock()
+    ft.backend = Backend()
+    m.TaskRegistry = TaskRegistry
+    m.fast_tasks = ft
+    monkeypatch.setitem(sys.modules, "fast_platform", types.ModuleType("fast_platform"))
+    monkeypatch.setitem(sys.modules, "fast_platform.src", types.ModuleType("fast_platform.src"))
+    monkeypatch.setitem(sys.modules, "fast_platform.src.task", m)
+    _sleep_calls: list[int] = []
+
+    def _sleep(_: float) -> None:
+        _sleep_calls.append(1)
+        if len(_sleep_calls) >= 2:
+            raise KeyboardInterrupt()
+
+    monkeypatch.setattr("fast_cli.commands.tasks_cmd.time.sleep", _sleep)
+    r = CliRunner().invoke(cli, ["tasks", "dashboard", "-r", "10000"])
+    assert r.exit_code == 0
+
+
+def test_run_interactive_email_key_sets_author_email_default(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pytest.importorskip("questionary")
+    monkeypatch.setattr(
+        "fast_cli.project_generation.load_user_defaults",
+        lambda: {"email": "only@e.co"},
+    )
+    out = tmp_path / "out"
+    out.mkdir()
+    monkeypatch.chdir(tmp_path)
+    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
+        with patch("fast_cli.project_generation.questionary") as q:
+            texts = iter(
+                [
+                    "projname",
+                    str(out),
+                    "Author",
+                    "a@b.co",
+                    "desc",
+                    "0.1.0",
+                    ".venv",
+                ]
+            )
+
+            def text_side(*a: object, **k: object) -> MagicMock:
+                m = MagicMock()
+                m.ask.return_value = next(texts)
+                return m
+
+            q.text.side_effect = text_side
+            conf = MagicMock()
+            conf.ask.side_effect = [True, True, True, True]
+            q.confirm.return_value = conf
+            q.select.return_value.ask.return_value = "3.11"
+            orch = ProjectGenerationOrchestrator()
+            with patch.object(orch, "_execute_pipeline"):
+                orch.run_interactive()
+            assert any(
+                getattr(c, "kwargs", {}).get("default") == "only@e.co"
+                for c in q.text.call_args_list
+            )
+
+
+def test_run_basic_email_default_from_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "fast_cli.project_generation.load_user_defaults",
+        lambda: {"email": "only@email.com"},
+    )
+    with patch("fast_cli.project_generation.HAS_QUESTIONARY", False):
+        with patch.object(
+            FrameworkSourceLocator,
+            "fast_mvc_root",
+            side_effect=RuntimeError("boom"),
+        ):
+
+            def fake_prompt(msg: str, default: str | None = None, **kwargs: object) -> str:
+                if "Project name" in msg:
+                    return "p"
+                if "Target directory" in msg:
+                    return str(tmp_path / "o")
+                if "Author name" in msg:
+                    return "A"
+                if "email" in msg.lower():
+                    assert default == "only@email.com"
+                    return "only@email.com"
+                if "description" in msg.lower():
+                    return "d"
+                if "version" in msg or "Initial" in msg:
+                    return "0.1.0"
+                raise AssertionError(msg)
+
+            def fake_confirm(msg: str, default: bool = True) -> bool:
+                if "virtual environment" in msg.lower():
+                    return False
+                raise AssertionError(msg)
+
+            with patch("fast_cli.project_generation.click.prompt", side_effect=fake_prompt):
+                with patch("fast_cli.project_generation.click.confirm", side_effect=fake_confirm):
+                    r = CliRunner().invoke(cli, ["generate"])
+                    assert r.exit_code != 0
 
 
 def test_run_interactive_full_wizard(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -521,3 +689,79 @@ def test_cache_clear_new_event_loop(tmp_path: Path) -> None:
         for k in list(sys.modules):
             if k == "fast_caching" or k.startswith("fast_caching."):
                 del sys.modules[k]
+
+
+def test_tasks_worker_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_platform" or name.startswith("fast_platform."):
+            raise ImportError("no fast_platform")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_platform" or k.startswith("fast_platform."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["tasks", "worker"])
+    assert r.exit_code == 0
+    assert "fast_tasks" in r.output.lower()
+
+
+def test_tasks_list_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_platform" or name.startswith("fast_platform."):
+            raise ImportError("no fast_platform")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_platform" or k.startswith("fast_platform."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["tasks", "list"])
+    assert r.exit_code == 0
+    assert "fast_tasks" in r.output.lower()
+
+
+def test_tasks_status_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_platform" or name.startswith("fast_platform."):
+            raise ImportError("no fast_platform")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_platform" or k.startswith("fast_platform."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["tasks", "status", "tid"])
+    assert r.exit_code == 0
+    assert "fast_tasks" in r.output.lower()
+
+
+def test_tasks_dashboard_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import builtins
+
+    real_import = builtins.__import__
+
+    def fake_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "fast_platform" or name.startswith("fast_platform."):
+            raise ImportError("no fast_platform")
+        return real_import(name, *args, **kwargs)
+
+    for k in list(sys.modules):
+        if k == "fast_platform" or k.startswith("fast_platform."):
+            del sys.modules[k]
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    r = CliRunner().invoke(cli, ["tasks", "dashboard"])
+    assert r.exit_code == 0
+    assert "fast_tasks" in r.output.lower()

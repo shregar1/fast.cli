@@ -15,11 +15,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from rich import box
 from rich.panel import Panel
 from rich.rule import Rule
 from rich.syntax import Syntax
 from rich.table import Table
-from rich import box
 
 from fast_cli.output import output
 from fast_cli.venv import VirtualEnvironmentService

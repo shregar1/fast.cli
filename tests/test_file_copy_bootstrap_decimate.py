@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 from click.testing import CliRunner
-
 from fast_cli.app import cli
 from fast_cli.commands.decimate_cmd import ArtifactDecimator
 from fast_cli.file_copy import ProjectCopier
 from fast_cli.project_setup import ProjectBootstrap
+
+
 def _ctx() -> dict:
     return {
         "project_name": "P",

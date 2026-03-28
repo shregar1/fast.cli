@@ -15,11 +15,10 @@ instance.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import click
 
 from fast_cli.project_generation import ProjectGenerationOrchestrator
+from fast_cli.user_config import load_user_defaults
 
 
 def register_generate_commands(cli: click.Group) -> None:
@@ -45,11 +44,11 @@ def register_generate_commands(cli: click.Group) -> None:
         "--install-deps/--no-install-deps", default=True, help="Install dependencies"
     )
     def generate(
-        name: Optional[str],
-        path: Optional[str],
-        author: Optional[str],
-        email: Optional[str],
-        description: Optional[str],
+        name: str | None,
+        path: str | None,
+        author: str | None,
+        email: str | None,
+        description: str | None,
         version: str,
         venv: bool,
         venv_name: str,
@@ -59,6 +58,19 @@ def register_generate_commands(cli: click.Group) -> None:
         if not all([name, path]):
             orchestrator.run_interactive()
             return
+        assert name is not None and path is not None
+        cfg = load_user_defaults()
+        if author is None and isinstance(cfg.get("author"), str):
+            author = cfg["author"]
+        if email is None:
+            e = cfg.get("author_email") or cfg.get("email")
+            if isinstance(e, str):
+                email = e
+        if description is None and isinstance(cfg.get("description"), str):
+            description = cfg["description"]
+        vname = cfg.get("venv_name")
+        if isinstance(vname, str) and vname.strip():
+            venv_name = vname.strip()
         orchestrator.run_cli_options(
             name=name,
             path=path or ".",
@@ -72,6 +84,7 @@ def register_generate_commands(cli: click.Group) -> None:
         )
 
     @cli.command(name="new")
+    @click.pass_context
     @click.option("--name", "-n", help="Project name")
     @click.option("--path", "-p", help="Target directory path")
     @click.option("--author", "-a", help="Author name")
@@ -84,27 +97,29 @@ def register_generate_commands(cli: click.Group) -> None:
         "--install-deps/--no-install-deps", default=True, help="Install dependencies"
     )
     def new(
-        name: Optional[str],
-        path: Optional[str],
-        author: Optional[str],
-        email: Optional[str],
-        description: Optional[str],
+        ctx: click.Context,
+        name: str | None,
+        path: str | None,
+        author: str | None,
+        email: str | None,
+        description: str | None,
         version: str,
         venv: bool,
         venv_name: str,
         install_deps: bool,
     ) -> None:
         """🆕 Alias for ``generate`` — create a new FastMVC project."""
-        generate.callback(
-            name,
-            path,
-            author,
-            email,
-            description,
-            version,
-            venv,
-            venv_name,
-            install_deps,
+        ctx.invoke(
+            generate,
+            name=name,
+            path=path,
+            author=author,
+            email=email,
+            description=description,
+            version=version,
+            venv=venv,
+            venv_name=venv_name,
+            install_deps=install_deps,
         )
 
     @cli.command()

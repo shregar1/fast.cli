@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from fast_cli.constants import ARTIFACTS_BY_LANGUAGE, DEFAULT_TEMPLATE_ITEMS
 from fast_cli.paths import FrameworkSourceLocator
 

@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-
 from fast_cli.app import cli
 from fast_cli.paths import FrameworkSourceLocator
 from fast_cli.project_generation import ProjectGenerationOrchestrator

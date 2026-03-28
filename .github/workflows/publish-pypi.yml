@@ -1,12 +1,16 @@
-# Build and upload to PyPI using an API token (repository secret).
+# Build and upload to PyPI using trusted publishing (OIDC). No long-lived PyPI
+# token is stored in GitHub.
 #
-# Setup:
-# 1. PyPI → Account settings → API tokens → Create a token for this project (or whole account).
-# 2. GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
-#    Name:  PYPI_API_TOKEN
-#    Value: the token string (starts with pypi-)
-# 3. Bump __version__ in fast_cli/__init__.py, then tag and push:
-#    git tag v1.5.1 && git push origin v1.5.1
+# One-time PyPI setup (per project):
+# 1. https://pypi.org/manage/project/fastmvc-cli/settings/publishing/ (or your project name)
+# 2. "Add a new pending publisher" → GitHub → fill owner, repository, workflow name:
+#    publish-pypi.yml
+# 3. Save; the publisher activates after the first successful upload from this workflow.
+#
+# Local uploads can still use an API token with twine (see README).
+#
+# Release: bump __version__ in fast_cli/__init__.py, then:
+#   git tag v1.5.1 && git push origin v1.5.1
 
 name: Publish to PyPI
 
@@ -17,6 +21,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -28,14 +33,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install build tools
-        run: pip install build twine
+      - name: Install build
+        run: pip install build
 
       - name: Build sdist and wheel
         run: python -m build
 
       - name: Publish to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: twine upload dist/*
+        uses: pypa/gh-action-pypi-publish@release/v1

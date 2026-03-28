@@ -11,11 +11,10 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 from click.testing import CliRunner
-from rich.console import Console
-
 from fast_cli.app import cli, main
 from fast_cli.commands import commit_history_setup as chs
 from fast_cli.output import CliOutput
+from rich.console import Console
 
 
 def test_new_command_invokes_pipeline(tmp_path: Path) -> None:

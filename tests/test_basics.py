@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 import fast_cli
+from click.testing import CliRunner
 from fast_cli import __version__
 from fast_cli.app import cli, main
 from fast_cli.cli import cli as cli_shim

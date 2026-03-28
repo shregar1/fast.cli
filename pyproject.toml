@@ -24,10 +24,12 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Code Generators",
     "Topic :: Utilities",
+    "Typing :: Typed",
 ]
 dependencies = [
     "click>=8.0",
     "pyyaml>=6.0",
+    "tomli>=2.0.0; python_version < '3.11'",
     "rich>=13.0",
     "fast-platform>=1.5.0",
     "fast-middleware>=1.5.0",
@@ -46,6 +48,9 @@ dev = [
     "questionary>=2.0",
     "build>=1.2",
     "twine>=5.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "types-PyYAML>=6.0",
 ]
 all = [
     "fastmvc-cli[interactive,dev]",
@@ -71,9 +76,37 @@ exclude_lines = [
     "if TYPE_CHECKING:",
 ]
 
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["fast_cli", "tests"]
+exclude = ["fast_cli/bundled"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008", "E501", "B904"]
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["fast_cli"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "fast_cli.validators"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "fast_cli.bundled.git_log_recorder"
+ignore_errors = true
+
 [project.urls]
 Homepage = "https://github.com/fastmvc/fast.cli"
+Documentation = "https://github.com/fastmvc/fast.cli#readme"
 Repository = "https://github.com/fastmvc/fast.cli"
+Changelog = "https://github.com/fastmvc/fast.cli/blob/main/CHANGELOG.md"
+Contributing = "https://github.com/fastmvc/fast.cli/blob/main/CONTRIBUTING.md"
 
 [project.scripts]
 fast = "fast_cli.app:main"
@@ -92,5 +125,8 @@ include = [
     "/fast_cli",
     "/README.md",
     "/LICENSE",
+    "/CHANGELOG.md",
+    "/CONTRIBUTING.md",
+    "/SECURITY.md",
     "/requirements.txt",
 ]

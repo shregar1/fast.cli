@@ -37,19 +37,20 @@ import shutil
 from pathlib import Path
 
 import click
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.panel import Panel
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.rule import Rule
 
 from fast_cli.file_copy import ProjectCopier
 from fast_cli.generation_ui import GenerationSummaryPresenter
-from fast_cli.gitignore import GitignoreUpdater
 from fast_cli.github_workflows import GitHubWorkflowsCopier
+from fast_cli.gitignore import GitignoreUpdater
 from fast_cli.output import output
 from fast_cli.paths import FrameworkSourceLocator
 from fast_cli.precommit import PreCommitInstaller
 from fast_cli.project_setup import ProjectBootstrap
 from fast_cli.template_engine import TemplateRenderer
+from fast_cli.user_config import load_user_defaults
 from fast_cli.validators import (
     HAS_QUESTIONARY,
     EmailValidator,
@@ -91,6 +92,7 @@ class ProjectGenerationOrchestrator:
         :meth:`run_basic`.
         """
         output.print_banner()
+        cfg = load_user_defaults()
         if not HAS_QUESTIONARY:
             output.console.print(
                 Panel(
@@ -134,17 +136,40 @@ class ProjectGenerationOrchestrator:
                 return
 
         output.print_step(3, "Author Information")
+        _author_default: str = (
+            (cfg.get("author") if isinstance(cfg.get("author"), str) else None)
+            or os.getenv("USER", "Developer")
+            or "Developer"
+        )
         author_name = questionary.text(
-            "👤 Author name:", default=os.getenv("USER", "Developer")
+            "👤 Author name:", default=_author_default
         ).ask()
-        author_email = questionary.text(
-            "📧 Author email:", validate=EmailValidator
-        ).ask()
+        _email_default = (
+            cfg.get("author_email")
+            if isinstance(cfg.get("author_email"), str)
+            else (cfg.get("email") if isinstance(cfg.get("email"), str) else None)
+        )
+        if isinstance(_email_default, str) and _email_default.strip():
+            author_email = questionary.text(
+                "📧 Author email:",
+                default=_email_default.strip(),
+                validate=EmailValidator,
+            ).ask()
+        else:
+            author_email = questionary.text(
+                "📧 Author email:", validate=EmailValidator
+            ).ask()
 
         output.print_step(4, "Project Details")
+        _desc_raw = cfg.get("description")
+        _desc_default: str = (
+            _desc_raw
+            if isinstance(_desc_raw, str)
+            else f"{project_name} - FastAPI backend built with FastMVC"
+        )
         description = questionary.text(
             "📝 Project description:",
-            default=f"{project_name} - FastAPI backend built with FastMVC",
+            default=_desc_default,
         ).ask()
         version = questionary.text("🔢 Initial version:", default="0.1.0").ask()
         python_version = questionary.select(
@@ -160,10 +185,12 @@ class ProjectGenerationOrchestrator:
         venv_name = ".venv"
         install_deps = False
         if create_venv:
+            _venv_raw = cfg.get("venv_name")
+            _venv_default: str = _venv_raw if isinstance(_venv_raw, str) else ".venv"
             venv_name = (
                 questionary.text(
                     "📁 Virtual environment name:",
-                    default=".venv",
+                    default=_venv_default,
                     instruction="(.venv or venv recommended)",
                 ).ask()
                 or ".venv"
@@ -222,23 +249,33 @@ class ProjectGenerationOrchestrator:
         no per-file progress bar) and does not offer pre-commit installation.
         """
         output.console.print("[bold]Basic Mode - Enter project details:[/bold]\n")
+        cfg = load_user_defaults()
         project_name = click.prompt("📛 Project name (valid Python identifier)")
         default_path = str(Path.cwd() / project_name)
         target_path_str = click.prompt("📁 Target directory", default=default_path)
         target_path = Path(target_path_str).expanduser().resolve()
+        _ad = cfg.get("author") if isinstance(cfg.get("author"), str) else None
         author_name = click.prompt(
-            "👤 Author name", default=os.getenv("USER", "Developer")
+            "👤 Author name", default=_ad or os.getenv("USER", "Developer")
         )
-        author_email = click.prompt("📧 Author email")
+        _em = cfg.get("author_email") or cfg.get("email")
+        if isinstance(_em, str) and _em.strip():
+            author_email = click.prompt("📧 Author email", default=_em.strip())
+        else:
+            author_email = click.prompt("📧 Author email")
+        _dd = cfg.get("description") if isinstance(cfg.get("description"), str) else None
         description = click.prompt(
-            "📝 Project description", default=f"{project_name} backend"
+            "📝 Project description", default=_dd or f"{project_name} backend"
         )
         version = click.prompt("🔢 Initial version", default="0.1.0")
         create_venv = click.confirm("🐍 Create virtual environment?", default=True)
         venv_name = ".venv"
         install_deps = False
         if create_venv:
-            venv_name = click.prompt("📁 Virtual environment name", default=".venv")
+            _vn = cfg.get("venv_name") if isinstance(cfg.get("venv_name"), str) else None
+            venv_name = click.prompt(
+                "📁 Virtual environment name", default=_vn or ".venv"
+            )
             install_deps = click.confirm("📦 Install dependencies?", default=True)
 
         context = {
@@ -265,7 +302,7 @@ class ProjectGenerationOrchestrator:
                 TextColumn("[bold blue]{task.description}"),
                 console=output.console,
             ) as progress:
-                task = progress.add_task("Generating project...", total=None)
+                _ = progress.add_task("Generating project...", total=None)
                 target_path.mkdir(parents=True, exist_ok=True)
                 for item in items:
                     source_path = source / item
@@ -346,13 +383,25 @@ class ProjectGenerationOrchestrator:
     ) -> None:
         """Create ``./<name>`` under the current working directory with defaults."""
         output.print_banner()
+        cfg = load_user_defaults()
+        vn = cfg.get("venv_name")
+        if isinstance(vn, str) and vn.strip():
+            venv_name = vn.strip()
+        _auth = cfg.get("author") if isinstance(cfg.get("author"), str) else None
+        _em = cfg.get("author_email") or cfg.get("email")
+        _email_s = _em.strip() if isinstance(_em, str) else ""
+        _desc = (
+            cfg.get("description")
+            if isinstance(cfg.get("description"), str)
+            else "FastAPI project built with FastMVC"
+        )
         target_path = Path.cwd() / name
         context = {
             "project_name": name,
             "project_slug": name,
-            "author_name": os.getenv("USER", "Developer"),
-            "author_email": "",
-            "description": "FastAPI project built with FastMVC",
+            "author_name": _auth or os.getenv("USER", "Developer"),
+            "author_email": _email_s,
+            "description": _desc,
             "version": "0.1.0",
             "python_version": "3.11",
             "venv_name": venv_name,

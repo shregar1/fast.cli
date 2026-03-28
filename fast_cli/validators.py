@@ -19,7 +19,7 @@ from __future__ import annotations
 import re
 
 try:
-    from questionary import Validator, ValidationError
+    from questionary import ValidationError, Validator
 
     HAS_QUESTIONARY = True
 

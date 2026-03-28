@@ -26,9 +26,11 @@ from fast_cli import __version__
 from fast_cli.commands.add_cmd import add_group
 from fast_cli.commands.cache_cmd import cache_group
 from fast_cli.commands.commit_history_setup import register_commit_history_setup
+from fast_cli.commands.completion_cmd import register_completion_command
 from fast_cli.commands.db_cmd import db_group
 from fast_cli.commands.decimate_cmd import register_decimate_command
 from fast_cli.commands.docs_cmd import docs_group
+from fast_cli.commands.doctor_cmd import register_doctor_commands
 from fast_cli.commands.generate_cmd import register_generate_commands
 from fast_cli.commands.misc_cmd import register_misc_commands
 from fast_cli.commands.tasks_cmd import tasks_group
@@ -69,6 +71,11 @@ def cli() -> None:
         setup-commit-log    Commit history JSON + pre-commit post-commit hook
 
     \b
+    Diagnostics:
+        doctor, check-env   Print Python, toolchain, and optional deps
+        completion          Print shell tab-completion script (bash/zsh/fish)
+
+    \b
     Legacy:
         make                Deprecated; use add or env
 
@@ -87,6 +94,8 @@ register_generate_commands(cli)
 register_misc_commands(cli)
 register_commit_history_setup(cli)
 register_decimate_command(cli)
+register_doctor_commands(cli)
+register_completion_command(cli)
 cli.add_command(docs_group)
 cli.add_command(db_group, name="db")
 cli.add_command(add_group, name="add")

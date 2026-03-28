@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
 from fast_cli.template_engine import TemplateRenderer
 
 
@@ -55,14 +54,13 @@ def test_template_renderer_read_error(tmp_path: Path) -> None:
 
 def test_validators_with_questionary() -> None:
     pytest.importorskip("questionary")
-    from questionary import ValidationError
-
     from fast_cli.validators import (
         HAS_QUESTIONARY,
         EmailValidator,
         PathValidator,
         ProjectNameValidator,
     )
+    from questionary import ValidationError
 
     assert HAS_QUESTIONARY is True
 

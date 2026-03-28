@@ -14,10 +14,10 @@ import asyncio
 import time
 
 import click
+from rich import box
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
-from rich import box
 
 from fast_cli.output import output
 
