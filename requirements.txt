@@ -1,0 +1,5 @@
+# FastMVC Ecosystem Full Stack — Local Development
+# Install with: pip install -r requirements.txt
+
+# Development Tools
+pre-commit>=3.0

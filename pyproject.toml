@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fast-cli"
+dynamic = ["version"]
+description = "FastMVC CLI — interactive FastAPI project generator and tooling"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Shiv" }]
+keywords = ["fastapi", "mvc", "cli", "generator", "fastmvc"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+    "fast-platform>=1.5.0",
+    "fast-middleware>=1.5.0",
+    "fast-database>=1.5.0",
+    "fast-dashboards>=1.5.0",
+    "fast-mvc>=1.4.0",
+]
+
+[project.optional-dependencies]
+interactive = ["questionary>=2.0"]
+dev = ["pre-commit>=3.0"]
+
+[project.urls]
+Homepage = "https://github.com/fastmvc/fast.cli"
+Repository = "https://github.com/fastmvc/fast.cli"
+
+[project.scripts]
+fast-cli = "fast_cli.app:main"
+fastmvc = "fast_cli.app:main"
+
+[tool.hatch.version]
+path = "fast_cli/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["fast_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/fast_cli",
+    "/README.md",
+    "/LICENSE",
+    "/requirements.txt",
+]
