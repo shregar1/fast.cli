@@ -25,6 +25,7 @@ import click
 from fast_cli import __version__
 from fast_cli.commands.add_cmd import add_group
 from fast_cli.commands.cache_cmd import cache_group
+from fast_cli.commands.checkpoint_cmd import register_checkpoint_command
 from fast_cli.commands.commit_history_setup import register_commit_history_setup
 from fast_cli.commands.completion_cmd import register_completion_command
 from fast_cli.commands.db_cmd import db_group
@@ -74,6 +75,7 @@ def cli() -> None:
     Cleanup & repo:
         decimate            Remove build/cache artifacts (python, java, rust, …)
         setup-commit-log    Commit history JSON + pre-commit post-commit hook
+        checkpoint save     Record HEAD in checkpoint.json (git rollback hints)
 
     \b
     Diagnostics:
@@ -91,6 +93,7 @@ def cli() -> None:
         fast add resource -f user -r create
         fast db upgrade
         fast setup-commit-log
+        fast checkpoint save -m "known good"
     """
     pass
 
@@ -100,6 +103,7 @@ register_misc_commands(cli)
 register_commit_history_setup(cli)
 register_decimate_command(cli)
 register_doctor_commands(cli)
+register_checkpoint_command(cli)
 register_completion_command(cli)
 cli.add_command(docs_group)
 cli.add_command(db_group, name="db")

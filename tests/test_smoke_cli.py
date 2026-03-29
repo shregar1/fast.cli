@@ -53,6 +53,11 @@ def test_smoke_db_help() -> None:
     assert p.returncode == 0
 
 
+def test_smoke_checkpoint_help() -> None:
+    p = _run(["checkpoint", "--help"])
+    assert p.returncode == 0
+
+
 def test_smoke_no_color() -> None:
     p = _run(["doctor"], extra_env={"NO_COLOR": "1"})
     assert p.returncode == 0

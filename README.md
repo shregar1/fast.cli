@@ -32,6 +32,7 @@ It does **not** replace FastAPI; it **organizes** how you build on it. If you wa
 - [Background tasks (`tasks`)](#background-tasks-tasks)
 - [Cleanup (`decimate`)](#cleanup-decimate)
 - [Commit history (`setup-commit-log`)](#commit-history-setup-commit-log)
+- [Checkpoints (`checkpoint`)](#checkpoints-checkpoint)
 - [Legacy (`make`)](#legacy-make)
 - [Related repositories](#related-repositories)
 - [Layout](#layout)
@@ -122,6 +123,7 @@ fast <command> --help
 | **Tasks** | `tasks worker`, `list`, `status`, `dashboard` | FastTasks / `fast_platform` workers (optional). |
 | **Cleanup** | `decimate` | Delete build/cache artifacts under a path. |
 | **Repo tooling** | `setup-commit-log` | Install commit-history recorder + pre-commit hook in any git repo. |
+| **Checkpoints** | `checkpoint save`, `list`, `show`, `revert` | Record `checkpoint.json` at the git root with safe commit SHAs; revert hints. **[Docs](docs/CHECKPOINTS.md)** |
 | **Diagnostics** | `doctor`, `check-env` | Python version, PATH tools (git, alembic, pre-commit), optional deps. |
 | **Shell** | `completion bash|zsh|fish` | Print Click 8 tab-completion script (requires `fast` on PATH). |
 | **Legacy** | `make` | Deprecated; forwards to `add` or `env`. |
@@ -376,6 +378,30 @@ pre-commit install --hook-type post-commit
 ```
 
 Each commit appends metadata to **`commit_history.json`** at the repository root.
+
+---
+
+## Checkpoints (`checkpoint`)
+
+Record **safe git commit markers** in **`checkpoint.json`** at the **git repository root** (same idea as `mobile.muse.app/checkpoint.json`). Use this before risky refactors so you can **`git reset --hard`** back to a known SHA with clear, documented steps.
+
+Full reference: **[docs/CHECKPOINTS.md](docs/CHECKPOINTS.md)** (also linked from PyPI as **Checkpoints**).
+
+| Command | Description |
+|--------|-------------|
+| `fast checkpoint save [-m "note"]` | Store current **HEAD** (fails if working tree is dirty unless `--allow-dirty`). |
+| `fast checkpoint list` | Show saved checkpoints. |
+| `fast checkpoint show <id>` | Print metadata and suggested `git` commands. |
+| `fast checkpoint revert <id>` | Dry-run by default; add **`--execute`** to run `git reset --hard` (confirm with **`--yes`** to skip prompt). |
+
+```bash
+cd /path/to/your/git/repo
+fast checkpoint save -m "Stable before API rewrite"
+fast checkpoint list
+fast checkpoint show cp-0001
+fast checkpoint revert cp-0001              # prints command only
+fast checkpoint revert cp-0001 --execute --yes
+```
 
 ---
 

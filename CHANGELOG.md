@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`fast checkpoint`** — `save` / `list` / `show` / `revert` with **`checkpoint.json`** at the git root; **[docs/CHECKPOINTS.md](docs/CHECKPOINTS.md)**; PyPI **Checkpoints** URL.
 - **docs/GETTING_STARTED.md** — ~15-minute path: install → quickstart/generate → doctor → next steps.
 - **docs/ROADMAP.md** — Informal product/CLI roadmap.
 - **examples/README.md** — How “official” examples are produced via `fast quickstart` / `fast generate`.

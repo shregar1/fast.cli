@@ -104,6 +104,7 @@ ignore_errors = true
 [project.urls]
 Homepage = "https://github.com/fastmvc/fast.cli"
 Documentation = "https://github.com/fastmvc/fast.cli/blob/main/docs/GETTING_STARTED.md"
+Checkpoints = "https://github.com/fastmvc/fast.cli/blob/main/docs/CHECKPOINTS.md"
 Repository = "https://github.com/fastmvc/fast.cli"
 Changelog = "https://github.com/fastmvc/fast.cli/blob/main/CHANGELOG.md"
 Contributing = "https://github.com/fastmvc/fast.cli/blob/main/CONTRIBUTING.md"

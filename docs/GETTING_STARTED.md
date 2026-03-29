@@ -72,6 +72,7 @@ Open **`http://localhost:8000/docs`** (or the port your template uses) for the i
 | Database migrations | `fast db migrate` / `fast db upgrade` (with `alembic.ini` in tree) |
 | API reference stubs | `fast docs generate` |
 | Shell tab completion | `fast completion bash` (or `zsh` / `fish`) |
+| Safe git rollback markers | `fast checkpoint save` — see **[CHECKPOINTS.md](CHECKPOINTS.md)** |
 
 See the main **[README](../README.md)** for the full command map.
 
