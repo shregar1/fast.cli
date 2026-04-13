@@ -21,13 +21,14 @@ from pathlib import Path
 
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from fast_cli.constants import DEFAULT_VENV_NAME, TIMEOUT_PRECOMMIT_INSTALL
 from fast_cli.output import output
 
 
 class PreCommitInstaller:
     """Install the ``pre-commit`` package and Git hook scripts in a project."""
 
-    def install(self, target_path: Path, venv_name: str = ".venv") -> bool:
+    def install(self, target_path: Path, venv_name: str = DEFAULT_VENV_NAME) -> bool:
         """Install pre-commit hooks under ``target_path``.
 
         Parameters
@@ -73,7 +74,7 @@ class PreCommitInstaller:
                     [str(pip_path), "install", "pre-commit", "-q"],
                     capture_output=True,
                     text=True,
-                    timeout=60,
+                    timeout=TIMEOUT_PRECOMMIT_INSTALL,
                 )
                 if result.returncode != 0:
                     output.print_warning(f"Could not install pre-commit: {result.stderr}")
@@ -98,7 +99,7 @@ class PreCommitInstaller:
                     [str(precommit_path), "install"],
                     capture_output=True,
                     text=True,
-                    timeout=60,
+                    timeout=TIMEOUT_PRECOMMIT_INSTALL,
                 )
                 if result.returncode != 0:
                     output.print_warning(f"Could not install hooks: {result.stderr}")

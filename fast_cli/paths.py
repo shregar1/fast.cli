@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fast_cli.constants import DEFAULT_TEMPLATE_ITEMS
+from fast_cli.constants import DEFAULT_TEMPLATE_ITEMS, FRAMEWORK_PACKAGE_NAME
 
 
 class FrameworkSourceLocator:
@@ -52,9 +52,9 @@ class FrameworkSourceLocator:
             without a local ``fast_mvc`` checkout; callers should handle empty
             template lists.
         """
-        fastmvc_dir = self.repo_root / "fast_mvc"
+        fastmvc_dir = self.repo_root / FRAMEWORK_PACKAGE_NAME
         if not fastmvc_dir.exists():
-            for path in (Path.cwd() / "fast_mvc", self._package_dir / "fast_mvc"):
+            for path in (Path.cwd() / FRAMEWORK_PACKAGE_NAME, self._package_dir / FRAMEWORK_PACKAGE_NAME):
                 if path.exists():
                     return path
         return fastmvc_dir

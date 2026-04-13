@@ -13,6 +13,7 @@ from pathlib import Path
 
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from fast_cli.constants import REQUIREMENTS_FILENAME, TIMEOUT_PIP_INSTALL, TIMEOUT_VENV_CREATE
 from fast_cli.output import output
 
 
@@ -51,7 +52,7 @@ class VirtualEnvironmentService:
                     [python_exe, "-m", "venv", str(venv_path)],
                     capture_output=True,
                     text=True,
-                    timeout=60,
+                    timeout=TIMEOUT_VENV_CREATE,
                 )
                 if result.returncode != 0:
                     output.print_error(f"Failed to create venv: {result.stderr}")
@@ -96,9 +97,9 @@ class VirtualEnvironmentService:
         else:
             pip_path = venv_path / "bin" / "pip"
 
-        requirements_path = target_path / "requirements.txt"
+        requirements_path = target_path / REQUIREMENTS_FILENAME
         if not requirements_path.exists():
-            output.print_warning("requirements.txt not found, skipping dependency installation")
+            output.print_warning(f"{REQUIREMENTS_FILENAME} not found, skipping dependency installation")
             return False
 
         with Progress(
@@ -112,7 +113,7 @@ class VirtualEnvironmentService:
                     [str(pip_path), "install", "-r", str(requirements_path)],
                     capture_output=True,
                     text=True,
-                    timeout=120,
+                    timeout=TIMEOUT_PIP_INSTALL,
                 )
                 if result.returncode != 0:
                     output.print_warning(f"Some dependencies failed to install: {result.stderr}")

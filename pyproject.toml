@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fastmvc-cli"
+name = "fastx-cli"
 dynamic = ["version"]
 description = "FastMVC CLI — interactive FastAPI project generator and tooling"
 readme = "README.md"
@@ -35,7 +35,7 @@ dependencies = [
     "fast-middleware>=1.5.0",
     "fast-database>=1.5.0",
     "fast-dashboards>=1.5.0",
-    "fast-mvc>=1.4.0",
+    "fastx-mvc>=1.5.0",
 ]
 
 [project.optional-dependencies]
@@ -57,8 +57,8 @@ all = [
     "fast-platform[all]",
     "fast-middleware",
     "fast-database",
-    "fast_dashboards",
-    "fast-mvc[all,dev,docs,interactive]",
+    "fast-dashboards",
+    "fastx-mvc[all,dev,docs,interactive]",
 ]
 
 [tool.pytest.ini_options]
@@ -102,12 +102,10 @@ module = "fast_cli.bundled.git_log_recorder"
 ignore_errors = true
 
 [project.urls]
-Homepage = "https://github.com/fastmvc/fast.cli"
-Documentation = "https://github.com/fastmvc/fast.cli/blob/main/docs/GETTING_STARTED.md"
-Checkpoints = "https://github.com/fastmvc/fast.cli/blob/main/docs/CHECKPOINTS.md"
-Repository = "https://github.com/fastmvc/fast.cli"
-Changelog = "https://github.com/fastmvc/fast.cli/blob/main/CHANGELOG.md"
-Contributing = "https://github.com/fastmvc/fast.cli/blob/main/CONTRIBUTING.md"
+Homepage = "https://github.com/shregar1/fastMVC"
+Documentation = "https://github.com/shregar1/fastMVC/blob/main/fast_cli/README.md"
+Repository = "https://github.com/shregar1/fastMVC"
+Changelog = "https://github.com/shregar1/fastMVC/blob/main/fast_cli/CHANGELOG.md"
 
 [project.scripts]
 fast = "fast_cli.app:main"

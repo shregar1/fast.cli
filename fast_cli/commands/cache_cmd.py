@@ -15,6 +15,10 @@ import asyncio
 import click
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from fast_cli.constants import (
+    OPTIONAL_DEPS_FAST_CACHING_ERROR,
+    OPTIONAL_DEPS_FAST_CACHING_IMPORT,
+)
 from fast_cli.output import output
 
 
@@ -35,7 +39,7 @@ def cache_clear() -> None:
     try:
         from fast_caching.src.fast_caching import fast_cache
     except ImportError:
-        output.print_error("fast_caching package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_CACHING_ERROR)
         return
 
     with Progress(
@@ -70,7 +74,7 @@ def cache_invalidate(tags: tuple[str, ...]) -> None:
     try:
         from fast_caching.src.fast_caching import fast_cache
     except ImportError:
-        output.print_error("fast_caching package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_CACHING_ERROR)
         return
 
     with Progress(

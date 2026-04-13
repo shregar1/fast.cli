@@ -24,6 +24,13 @@ from rich.panel import Panel
 from rich.rule import Rule
 from rich.text import Text
 
+from fast_cli.constants import (
+    BANNER_SUBTITLE,
+    BANNER_WIDTH_THRESHOLD,
+    BOOLEAN_TRUE_VALUES,
+    ENV_MINIMAL_BANNER,
+)
+
 
 def _lerp_hex(t: float) -> str:
     """Interpolate between cyan (#22d3ee) and violet (#a78bfa) for line gradients."""
@@ -48,7 +55,7 @@ _C_TITLE = "#f8fafc"
 
 def _env_flag(name: str) -> bool:
     v = os.environ.get(name, "").strip().lower()
-    return v in ("1", "true", "yes", "on")
+    return v in BOOLEAN_TRUE_VALUES
 
 
 def _ascii_stdout() -> bool:
@@ -58,10 +65,10 @@ def _ascii_stdout() -> bool:
 
 def _use_compact_banner(console: Console) -> bool:
     """Prefer a short banner for narrow terminals, CI logs, or explicit opt-in."""
-    if _env_flag("FAST_CLI_MINIMAL_BANNER"):
+    if _env_flag(ENV_MINIMAL_BANNER):
         return True
     w = console.width
-    if w and w < 56:
+    if w and w < BANNER_WIDTH_THRESHOLD:
         return True
     return False
 
@@ -91,9 +98,9 @@ class CliOutput:
     def _print_banner_compact(self) -> None:
         """Plain banner for small terminals, dumb TERM, or ASCII-only streams."""
         sub = (
-            "FastAPI / MVC / Production-ready"
+            BANNER_SUBTITLE
             if _ascii_stdout()
-            else "FastAPI · MVC · Production-ready"
+            else BANNER_SUBTITLE.replace(" / ", " · ")
         )
         self.console.print()
         self.console.print(Align.center(Text("FastMVC CLI", style="bold")))

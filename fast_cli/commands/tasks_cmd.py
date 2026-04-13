@@ -19,6 +19,12 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 
+from fast_cli.constants import (
+    DEFAULT_DASHBOARD_REFRESH_MS,
+    DEFAULT_TASK_CONCURRENCY,
+    OPTIONAL_DEPS_FAST_PLATFORM_ERROR,
+    OPTIONAL_DEPS_FAST_PLATFORM_IMPORT,
+)
 from fast_cli.output import output
 
 
@@ -33,14 +39,14 @@ def tasks_group() -> None:
 
 
 @tasks_group.command(name="worker")
-@click.option("--concurrency", "-c", default=10, help="Max active tasks")
+@click.option("--concurrency", "-c", default=DEFAULT_TASK_CONCURRENCY, help="Max active tasks")
 def tasks_worker(concurrency: int) -> None:
     """Launch a background task worker."""
     output.print_banner()
     try:
         from fast_platform.src.task import Worker
     except ImportError:
-        output.print_error("fast_tasks package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
 
     output.print_success(f"Starting FastTasks Worker (concurrency={concurrency})...")
@@ -59,7 +65,7 @@ def tasks_list() -> None:
     try:
         from fast_platform.src.task import TaskRegistry
     except ImportError:
-        output.print_error("fast_tasks package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
 
     tasks = TaskRegistry.all_tasks()
@@ -84,7 +90,7 @@ def tasks_status(task_id: str) -> None:
     try:
         from fast_platform.src.task import fast_tasks
     except ImportError:
-        output.print_error("fast_tasks package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
 
     try:
@@ -117,13 +123,13 @@ def tasks_status(task_id: str) -> None:
 
 
 @tasks_group.command(name="dashboard")
-@click.option("--refresh", "-r", default=1000, help="Refresh interval (ms)")
+@click.option("--refresh", "-r", default=DEFAULT_DASHBOARD_REFRESH_MS, help="Refresh interval (ms)")
 def tasks_dashboard(refresh: int) -> None:
     """📊 Live dashboard for FastTasks monitoring."""
     try:
         from fast_platform.src.task import TaskRegistry, fast_tasks
     except ImportError:
-        output.print_error("fast_tasks package not found in paths")
+        output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
 
     try:

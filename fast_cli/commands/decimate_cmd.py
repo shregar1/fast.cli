@@ -20,7 +20,7 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
-from fast_cli.constants import ARTIFACTS_BY_LANGUAGE
+from fast_cli.constants import ARTIFACTS_BY_LANGUAGE, VENV_EXCLUDE_DIRS
 from fast_cli.output import output
 
 
@@ -35,7 +35,7 @@ class ArtifactDecimator:
     def run(self) -> None:
         """Perform the scan and deletion pass, printing each removed path."""
         dir_patterns, file_patterns = self._patterns()
-        exclude_dirs = {".git", ".venv", "venv", "ENV", "env"}
+        exclude_dirs = VENV_EXCLUDE_DIRS
 
         output.print_banner()
         output.console.print(

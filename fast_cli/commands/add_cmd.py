@@ -16,6 +16,7 @@ from pathlib import Path
 import click
 
 from fast_cli.commands.project_root import resolve_fastmvc_project_root
+from fast_cli.constants import FRAMEWORK_CONTROLLER_PATH
 from fast_cli.output import output
 from fast_cli.validators import HAS_QUESTIONARY
 
@@ -267,7 +268,7 @@ def add_resource(folder: str, resource: str, version: str, crud: bool) -> None:
         api_version = f"v{api_version}"
 
     target_path = resolve_fastmvc_project_root()
-    if not (target_path / "abstractions" / "controller.py").exists():
+    if not (target_path / FRAMEWORK_CONTROLLER_PATH).exists():
         output.print_error(
             f"Not in a FastMVC project (could not find abstractions/controller.py in {target_path})"
         )

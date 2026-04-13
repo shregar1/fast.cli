@@ -26,6 +26,11 @@ import click
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from fast_cli.constants import (
+    TIMEOUT_ALEMBIC_MUTATION,
+    TIMEOUT_ALEMBIC_QUERY,
+    TIMEOUT_SEED_SCRIPT,
+)
 from fast_cli.output import output
 from fast_cli.validators import HAS_QUESTIONARY
 
@@ -108,7 +113,7 @@ def db_migrate(message: str, autogenerate: bool) -> None:
     ) as progress:
         task = progress.add_task("[cyan]Generating migration...", total=None)
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_MUTATION)
             progress.update(task, completed=True)
             if result.returncode != 0:
                 output.print_error(f"Migration failed:\n{result.stderr}")
@@ -160,7 +165,7 @@ def db_upgrade(revision: str) -> None:
         task = progress.add_task("[cyan]Applying migrations...", total=None)
         try:
             current_result = subprocess.run(
-                ["alembic", "current"], capture_output=True, text=True, timeout=30
+                ["alembic", "current"], capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY
             )
             current_rev = (
                 current_result.stdout.strip()
@@ -171,7 +176,7 @@ def db_upgrade(revision: str) -> None:
                 ["alembic", "upgrade", revision],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=TIMEOUT_ALEMBIC_MUTATION,
             )
             progress.update(task, completed=True)
             if result.returncode != 0:
@@ -235,7 +240,7 @@ def db_downgrade(revision: str) -> None:
         task = progress.add_task("[cyan]Rolling back migrations...", total=None)
         try:
             current_result = subprocess.run(
-                ["alembic", "current"], capture_output=True, text=True, timeout=30
+                ["alembic", "current"], capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY
             )
             current_rev = (
                 current_result.stdout.strip()
@@ -246,7 +251,7 @@ def db_downgrade(revision: str) -> None:
                 ["alembic", "downgrade", revision],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=TIMEOUT_ALEMBIC_MUTATION,
             )
             progress.update(task, completed=True)
             if result.returncode != 0:
@@ -322,7 +327,7 @@ def db_reset(seed: bool) -> None:
                 ["alembic", "downgrade", "I"],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=TIMEOUT_ALEMBIC_MUTATION,
             )
             if result.returncode != 0:
                 progress.update(task, completed=True)
@@ -340,7 +345,7 @@ def db_reset(seed: bool) -> None:
                 ["alembic", "upgrade", "head"],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=TIMEOUT_ALEMBIC_MUTATION,
             )
             if result.returncode != 0:
                 progress.update(task, completed=True)
@@ -361,7 +366,7 @@ def db_reset(seed: bool) -> None:
                         [sys.executable, str(seed_script)],
                         capture_output=True,
                         text=True,
-                        timeout=60,
+                        timeout=TIMEOUT_SEED_SCRIPT,
                     )
                     if result.returncode != 0:
                         output.print_warning(
@@ -402,7 +407,7 @@ def db_history(verbose: bool) -> None:
     try:
         output.console.print("[bold]Current Revision:[/bold]")
         result = subprocess.run(
-            ["alembic", "current"], capture_output=True, text=True, timeout=30
+            ["alembic", "current"], capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY
         )
         if result.returncode == 0:
             output.console.print(f"  {result.stdout}")
@@ -414,7 +419,7 @@ def db_history(verbose: bool) -> None:
         if verbose:
             cmd.append("--verbose")
         cmd.append("--indicate-current")
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY)
         if result.returncode == 0:
             for line in result.stdout.split("\n"):
                 if "(current)" in line:
@@ -440,7 +445,7 @@ def db_status() -> None:
 
     try:
         result = subprocess.run(
-            ["alembic", "current"], capture_output=True, text=True, timeout=30
+            ["alembic", "current"], capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY
         )
         if result.returncode == 0:
             current = result.stdout.strip()
@@ -451,7 +456,7 @@ def db_status() -> None:
                     "[bold]Current:[/bold] [yellow]None (dataI not initialized)[/yellow]"
                 )
         result = subprocess.run(
-            ["alembic", "heads"], capture_output=True, text=True, timeout=30
+            ["alembic", "heads"], capture_output=True, text=True, timeout=TIMEOUT_ALEMBIC_QUERY
         )
         if result.returncode == 0:
             heads = result.stdout.strip()
@@ -464,7 +469,7 @@ def db_status() -> None:
             ["alembic", "history", "--indicate-current"],
             capture_output=True,
             text=True,
-            timeout=30,
+            timeout=TIMEOUT_ALEMBIC_QUERY,
         )
         if result.returncode == 0:
             lines = result.stdout.strip().split("\n")

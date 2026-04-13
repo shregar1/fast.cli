@@ -12,6 +12,12 @@ from typing import Any
 import click
 from rich.table import Table
 
+from fast_cli.constants import (
+    CHECKPOINT_JSON_INDENT,
+    CHECKPOINT_MESSAGE_PREVIEW_LEN,
+    CHECKPOINT_SHORT_HASH_LEN,
+    CHECKPOINT_TIMESTAMP_DISPLAY_LEN,
+)
 from fast_cli.output import output
 
 CHECKPOINT_FILENAME = "checkpoint.json"
@@ -61,7 +67,7 @@ def _load_checkpoint_file(path: Path) -> dict[str, Any]:
 
 def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    raw = json.dumps(payload, indent=2, sort_keys=False) + "\n"
+    raw = json.dumps(payload, indent=CHECKPOINT_JSON_INDENT, sort_keys=False) + "\n"
     tmp = path.with_suffix(f".{uuid.uuid4().hex}.tmp")
     try:
         tmp.write_text(raw, encoding="utf-8")
@@ -165,10 +171,10 @@ def register_checkpoint_command(cli: click.Group) -> None:
                 continue
             table.add_row(
                 str(cp.get("id", "—")),
-                str(cp.get("created_at", "—"))[:19].replace("T", " "),
-                str(cp.get("git_commit_short", cp.get("git_commit", "—")))[:12],
+                str(cp.get("created_at", "—"))[:CHECKPOINT_TIMESTAMP_DISPLAY_LEN].replace("T", " "),
+                str(cp.get("git_commit_short", cp.get("git_commit", "—")))[:CHECKPOINT_SHORT_HASH_LEN],
                 str(cp.get("branch", "—")),
-                (cp.get("message") or "—")[:40],
+                (cp.get("message") or "—")[:CHECKPOINT_MESSAGE_PREVIEW_LEN],
             )
         output.console.print(table)
 

@@ -26,6 +26,6 @@ fast_cli.app : Root Click group and ``main`` entry point.
 fast_cli.project_generation : High-level new-project orchestration.
 """
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 
 __all__ = ["__version__"]

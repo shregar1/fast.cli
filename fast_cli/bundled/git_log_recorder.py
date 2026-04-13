@@ -5,9 +5,11 @@ Logs commit details to commit_history.json in a parsable format.
 
 import json
 import subprocess
-from typing import List, Dict, Any
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+from fast_cli.constants import GIT_LOG_MAX_ENTRIES, GIT_LOG_RECENT_WINDOW
 
 
 def get_repo_root() -> Path | None:
@@ -93,11 +95,11 @@ def main():
 
     # Update or Add (prevent duplicates if hook runs twice)
     # Check if this hash is already in the last 5 logs (common race condition)
-    hashes = [l.get("hash") for l in logs[:5]]
+    hashes = [l.get("hash") for l in logs[:GIT_LOG_RECENT_WINDOW]]
     if metadata["hash"] not in hashes:
         logs.insert(0, metadata)
         # Keep last 100 commits
-        processed_logs = logs[:100]
+        processed_logs = logs[:GIT_LOG_MAX_ENTRIES]
 
         with open(log_file, "w") as f:
             json.dump(processed_logs, f, indent=2)

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import click
 
+from fast_cli.constants import DEFAULT_PROJECT_NAME, DEFAULT_PROJECT_VERSION, DEFAULT_VENV_NAME
 from fast_cli.project_generation import ProjectGenerationOrchestrator
 from fast_cli.user_config import load_user_defaults
 
@@ -37,9 +38,9 @@ def register_generate_commands(cli: click.Group) -> None:
     @click.option("--author", "-a", help="Author name")
     @click.option("--email", "-e", help="Author email")
     @click.option("--description", "-d", help="Project description")
-    @click.option("--version", "-v", default="0.1.0", help="Initial version")
+    @click.option("--version", "-v", default=DEFAULT_PROJECT_VERSION, help="Initial version")
     @click.option("--venv/--no-venv", default=True, help="Create virtual environment")
-    @click.option("--venv-name", default=".venv", help="Virtual environment name")
+    @click.option("--venv-name", default=DEFAULT_VENV_NAME, help="Virtual environment name")
     @click.option(
         "--install-deps/--no-install-deps", default=True, help="Install dependencies"
     )
@@ -90,9 +91,9 @@ def register_generate_commands(cli: click.Group) -> None:
     @click.option("--author", "-a", help="Author name")
     @click.option("--email", "-e", help="Author email")
     @click.option("--description", "-d", help="Project description")
-    @click.option("--version", "-v", default="0.1.0", help="Initial version")
+    @click.option("--version", "-v", default=DEFAULT_PROJECT_VERSION, help="Initial version")
     @click.option("--venv/--no-venv", default=True, help="Create virtual environment")
-    @click.option("--venv-name", default=".venv", help="Virtual environment name")
+    @click.option("--venv-name", default=DEFAULT_VENV_NAME, help="Virtual environment name")
     @click.option(
         "--install-deps/--no-install-deps", default=True, help="Install dependencies"
     )
@@ -123,8 +124,8 @@ def register_generate_commands(cli: click.Group) -> None:
         )
 
     @cli.command()
-    @click.option("--name", "-n", default="my_fastapi_project", help="Project name")
-    @click.option("--venv-name", default=".venv", help="Virtual environment name")
+    @click.option("--name", "-n", default=DEFAULT_PROJECT_NAME, help="Project name")
+    @click.option("--venv-name", default=DEFAULT_VENV_NAME, help="Virtual environment name")
     @click.option(
         "--install-deps/--no-install-deps", default=True, help="Install dependencies"
     )

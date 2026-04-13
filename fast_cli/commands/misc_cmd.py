@@ -8,6 +8,7 @@ import click
 
 from fast_cli.commands.add_cmd import add_resource
 from fast_cli.commands.project_root import resolve_fastmvc_project_root
+from fast_cli.constants import ENV_EXAMPLE_FILENAME, ENV_FILENAME
 from fast_cli.output import output
 from fast_cli.project_setup import ProjectBootstrap
 
@@ -45,5 +46,5 @@ def register_misc_commands(cli: click.Group) -> None:
             output.print_success("Environment file generated successfully!")
         else:
             output.print_error(
-                "Failed to generate .env (ensure .env.example exists and .env does not)."
+                f"Failed to generate {ENV_FILENAME} (ensure {ENV_EXAMPLE_FILENAME} exists and {ENV_FILENAME} does not)."
             )

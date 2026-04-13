@@ -8,7 +8,7 @@ from unittest.mock import patch
 from click.testing import CliRunner
 from fast_cli.app import cli
 from fast_cli.commands.decimate_cmd import ArtifactDecimator
-from fast_cli.file_copy import ProjectCopier
+from fast_cli.file_copy import ProjectCopier, template_copytree_ignore
 from fast_cli.project_setup import ProjectBootstrap
 
 
@@ -22,6 +22,29 @@ def _ctx() -> dict:
         "version": "1.0.0",
         "python_version": "3.11",
     }
+
+
+def test_template_copytree_ignore_omits_tests_framework(tmp_path: Path) -> None:
+    tests_root = tmp_path / "tests"
+    tests_root.mkdir()
+    (tests_root / "framework").mkdir()
+    (tests_root / "framework" / "internal.py").write_text("#")
+    (tests_root / "dev").mkdir()
+    (tests_root / "dev" / "sample.py").write_text("#")
+
+    ign = template_copytree_ignore(tests_root)
+    skipped = ign(str(tests_root), ["framework", "dev", "__pycache__"])
+    assert "framework" in skipped
+    assert "dev" not in skipped
+
+
+def test_template_copytree_ignore_does_not_skip_framework_elsewhere(tmp_path: Path) -> None:
+    core = tmp_path / "core"
+    core.mkdir()
+    (core / "framework").mkdir()
+    ign = template_copytree_ignore(core)
+    skipped = ign(str(core), ["framework", "x.py"])
+    assert "framework" not in skipped
 
 
 def test_project_copier_copy_dir_and_file(tmp_path: Path) -> None:

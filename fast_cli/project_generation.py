@@ -36,12 +36,24 @@ import secrets
 import shutil
 from pathlib import Path
 
+from fast_cli.constants import (
+    BCRYPT_RANDOM_LENGTH,
+    BCRYPT_SALT_PREFIX,
+    DEFAULT_APP_PORT,
+    DEFAULT_AUTHOR_NAME,
+    DEFAULT_PYTHON_VERSION,
+    DEFAULT_PROJECT_VERSION,
+    DEFAULT_VENV_NAME,
+    JWT_SECRET_KEY_LENGTH,
+    SUPPORTED_PYTHON_VERSIONS,
+)
+
 import click
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.rule import Rule
 
-from fast_cli.file_copy import ProjectCopier
+from fast_cli.file_copy import ProjectCopier, template_copytree_ignore
 from fast_cli.generation_ui import GenerationSummaryPresenter
 from fast_cli.github_workflows import GitHubWorkflowsCopier
 from fast_cli.gitignore import GitignoreUpdater
@@ -139,7 +151,7 @@ class ProjectGenerationOrchestrator:
         _author_default: str = (
             (cfg.get("author") if isinstance(cfg.get("author"), str) else None)
             or os.getenv("USER", "Developer")
-            or "Developer"
+            or DEFAULT_AUTHOR_NAME
         )
         author_name = questionary.text(
             "👤 Author name:", default=_author_default
@@ -171,29 +183,29 @@ class ProjectGenerationOrchestrator:
             "📝 Project description:",
             default=_desc_default,
         ).ask()
-        version = questionary.text("🔢 Initial version:", default="0.1.0").ask()
+        version = questionary.text("🔢 Initial version:", default=DEFAULT_PROJECT_VERSION).ask()
         python_version = questionary.select(
             "🐍 Python version:",
-            choices=["3.10", "3.11", "3.12", "3.13"],
-            default="3.11",
+            choices=list(SUPPORTED_PYTHON_VERSIONS),
+            default=DEFAULT_PYTHON_VERSION,
         ).ask()
 
         output.print_step(5, "Virtual Environment")
         create_venv = questionary.confirm(
             "🐍 Create virtual environment automatically?", default=True
         ).ask()
-        venv_name = ".venv"
+        venv_name = DEFAULT_VENV_NAME
         install_deps = False
         if create_venv:
             _venv_raw = cfg.get("venv_name")
-            _venv_default: str = _venv_raw if isinstance(_venv_raw, str) else ".venv"
+            _venv_default: str = _venv_raw if isinstance(_venv_raw, str) else DEFAULT_VENV_NAME
             venv_name = (
                 questionary.text(
                     "📁 Virtual environment name:",
                     default=_venv_default,
                     instruction="(.venv or venv recommended)",
                 ).ask()
-                or ".venv"
+                or DEFAULT_VENV_NAME
             )
             install_deps = questionary.confirm(
                 "📦 Install dependencies automatically?",
@@ -213,18 +225,18 @@ class ProjectGenerationOrchestrator:
         context = {
             "project_name": project_name,
             "project_slug": project_name.lower().replace(" ", "_").replace("-", "_"),
-            "author_name": author_name or "Developer",
+            "author_name": author_name or DEFAULT_AUTHOR_NAME,
             "author_email": author_email or "",
             "description": description or "",
-            "version": version or "0.1.0",
-            "python_version": python_version or "3.11",
+            "version": version or DEFAULT_PROJECT_VERSION,
+            "python_version": python_version or DEFAULT_PYTHON_VERSION,
             "venv_name": venv_name,
             "create_venv": create_venv,
             "install_deps": install_deps,
             "init_precommit": init_precommit,
-            "jwt_secret_key": secrets.token_urlsafe(32),
-            "bcrypt_salt": f"$2b$12${secrets.token_urlsafe(16)[:22]}",
-            "app_port": "8000",
+            "jwt_secret_key": secrets.token_urlsafe(JWT_SECRET_KEY_LENGTH),
+            "bcrypt_salt": f"{BCRYPT_SALT_PREFIX}{secrets.token_urlsafe(BCRYPT_RANDOM_LENGTH)[:22]}",
+            "app_port": DEFAULT_APP_PORT,
         }
 
         output.console.print(
@@ -268,7 +280,7 @@ class ProjectGenerationOrchestrator:
         target_path = Path(target_path_str).expanduser().resolve()
         _ad = cfg.get("author") if isinstance(cfg.get("author"), str) else None
         author_name = click.prompt(
-            "👤 Author name", default=_ad or os.getenv("USER", "Developer")
+            "👤 Author name", default=_ad or os.getenv("USER", DEFAULT_AUTHOR_NAME)
         )
         _em = cfg.get("author_email") or cfg.get("email")
         if isinstance(_em, str) and _em.strip():
@@ -279,14 +291,14 @@ class ProjectGenerationOrchestrator:
         description = click.prompt(
             "📝 Project description", default=_dd or f"{project_name} backend"
         )
-        version = click.prompt("🔢 Initial version", default="0.1.0")
+        version = click.prompt("🔢 Initial version", default=DEFAULT_PROJECT_VERSION)
         create_venv = click.confirm("🐍 Create virtual environment?", default=True)
-        venv_name = ".venv"
+        venv_name = DEFAULT_VENV_NAME
         install_deps = False
         if create_venv:
             _vn = cfg.get("venv_name") if isinstance(cfg.get("venv_name"), str) else None
             venv_name = click.prompt(
-                "📁 Virtual environment name", default=_vn or ".venv"
+                "📁 Virtual environment name", default=_vn or DEFAULT_VENV_NAME
             )
             install_deps = click.confirm("📦 Install dependencies?", default=True)
 
@@ -297,13 +309,13 @@ class ProjectGenerationOrchestrator:
             "author_email": author_email,
             "description": description,
             "version": version,
-            "python_version": "3.11",
+            "python_version": DEFAULT_PYTHON_VERSION,
             "venv_name": venv_name,
             "create_venv": create_venv,
             "install_deps": install_deps,
-            "jwt_secret_key": secrets.token_urlsafe(32),
-            "bcrypt_salt": f"$2b$12${secrets.token_urlsafe(16)}",
-            "app_port": "8000",
+            "jwt_secret_key": secrets.token_urlsafe(JWT_SECRET_KEY_LENGTH),
+            "bcrypt_salt": f"{BCRYPT_SALT_PREFIX}{secrets.token_urlsafe(BCRYPT_RANDOM_LENGTH)}",
+            "app_port": DEFAULT_APP_PORT,
         }
 
         try:
@@ -321,7 +333,11 @@ class ProjectGenerationOrchestrator:
                     target_item_path = target_path / item
                     try:
                         if source_path.is_dir():
-                            shutil.copytree(source_path, target_item_path)
+                            shutil.copytree(
+                                source_path,
+                                target_item_path,
+                                ignore=template_copytree_ignore(source_path),
+                            )
                         else:
                             shutil.copy2(source_path, target_item_path)
                             self._renderer.process_file(target_item_path, context)
@@ -371,17 +387,17 @@ class ProjectGenerationOrchestrator:
         context = {
             "project_name": _name,
             "project_slug": _name.lower().replace(" ", "_").replace("-", "_"),
-            "author_name": author or os.getenv("USER", "Developer"),
+            "author_name": author or os.getenv("USER", DEFAULT_AUTHOR_NAME),
             "author_email": email or "",
             "description": description or f"{name} - FastAPI backend",
             "version": version,
-            "python_version": "3.11",
+            "python_version": DEFAULT_PYTHON_VERSION,
             "venv_name": venv_name,
             "create_venv": venv,
             "install_deps": install_deps,
-            "jwt_secret_key": secrets.token_urlsafe(32),
-            "bcrypt_salt": f"$2b$12${secrets.token_urlsafe(16)}",
-            "app_port": "8000",
+            "jwt_secret_key": secrets.token_urlsafe(JWT_SECRET_KEY_LENGTH),
+            "bcrypt_salt": f"{BCRYPT_SALT_PREFIX}{secrets.token_urlsafe(BCRYPT_RANDOM_LENGTH)}",
+            "app_port": DEFAULT_APP_PORT,
         }
         try:
             output.console.print(f"\n[bold cyan]Generating project:[/bold cyan] {name}")
@@ -411,17 +427,17 @@ class ProjectGenerationOrchestrator:
         context = {
             "project_name": name,
             "project_slug": name,
-            "author_name": _auth or os.getenv("USER", "Developer"),
+            "author_name": _auth or os.getenv("USER", DEFAULT_AUTHOR_NAME),
             "author_email": _email_s,
             "description": _desc,
-            "version": "0.1.0",
-            "python_version": "3.11",
+            "version": DEFAULT_PROJECT_VERSION,
+            "python_version": DEFAULT_PYTHON_VERSION,
             "venv_name": venv_name,
             "create_venv": True,
             "install_deps": install_deps,
-            "jwt_secret_key": secrets.token_urlsafe(32),
-            "bcrypt_salt": f"$2b$12${secrets.token_urlsafe(16)}",
-            "app_port": "8000",
+            "jwt_secret_key": secrets.token_urlsafe(JWT_SECRET_KEY_LENGTH),
+            "bcrypt_salt": f"{BCRYPT_SALT_PREFIX}{secrets.token_urlsafe(BCRYPT_RANDOM_LENGTH)}",
+            "app_port": DEFAULT_APP_PORT,
         }
         try:
             output.console.print(f"\n[bold cyan]Quick starting:[/bold cyan] {name}")
@@ -454,7 +470,7 @@ class ProjectGenerationOrchestrator:
         deps_installed = False
         if context.get("create_venv", False):
             output.console.print()
-            vn = str(context.get("venv_name", ".venv"))
+            vn = str(context.get("venv_name", DEFAULT_VENV_NAME))
             venv_created = self._venv.create(target_path, vn)
             if venv_created:
                 self._gitignore.update_for_venv(target_path, vn)

@@ -21,6 +21,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from fast_cli.constants import (
+    DEFAULT_APP_PORT,
+    DEFAULT_BCRYPT_SALT,
+    TEMPLATE_PLACEHOLDER_APP_PORT,
+    TEMPLATE_PLACEHOLDER_AUTHOR_EMAIL,
+    TEMPLATE_PLACEHOLDER_AUTHOR_NAME,
+    TEMPLATE_PLACEHOLDER_BCRYPT_SALT,
+    TEMPLATE_PLACEHOLDER_DESCRIPTION,
+    TEMPLATE_PLACEHOLDER_JWT_SECRET_KEY,
+    TEMPLATE_PLACEHOLDER_PROJECT_NAME,
+    TEMPLATE_PLACEHOLDER_PROJECT_SLUG,
+    TEMPLATE_PLACEHOLDER_PYTHON_VERSION,
+    TEMPLATE_PLACEHOLDER_VERSION,
+)
+
 
 class TemplateRenderer:
     """Applies ``{{PLACEHOLDER}}`` substitutions for project scaffolding."""
@@ -45,18 +60,18 @@ class TemplateRenderer:
             return
 
         replacements = {
-            "{{PROJECT_NAME}}": context["project_name"],
-            "{{PROJECT_SLUG}}": context["project_slug"],
-            "{{AUTHOR_NAME}}": context["author_name"],
-            "{{AUTHOR_EMAIL}}": context["author_email"],
-            "{{DESCRIPTION}}": context["description"],
-            "{{VERSION}}": context["version"],
-            "{{PYTHON_VERSION}}": context["python_version"],
-            "{{JWT_SECRET_KEY}}": context.get("jwt_secret_key", "your-secret-key-here"),
-            "{{BCRYPT_SALT}}": context.get(
-                "bcrypt_salt", "$2b$12$LQv3c1yqBWVHxkd0LHAkCO"
+            TEMPLATE_PLACEHOLDER_PROJECT_NAME: context["project_name"],
+            TEMPLATE_PLACEHOLDER_PROJECT_SLUG: context["project_slug"],
+            TEMPLATE_PLACEHOLDER_AUTHOR_NAME: context["author_name"],
+            TEMPLATE_PLACEHOLDER_AUTHOR_EMAIL: context["author_email"],
+            TEMPLATE_PLACEHOLDER_DESCRIPTION: context["description"],
+            TEMPLATE_PLACEHOLDER_VERSION: context["version"],
+            TEMPLATE_PLACEHOLDER_PYTHON_VERSION: context["python_version"],
+            TEMPLATE_PLACEHOLDER_JWT_SECRET_KEY: context.get("jwt_secret_key", "your-secret-key-here"),
+            TEMPLATE_PLACEHOLDER_BCRYPT_SALT: context.get(
+                "bcrypt_salt", DEFAULT_BCRYPT_SALT
             ),
-            "{{APP_PORT}}": context.get("app_port", "8000"),
+            TEMPLATE_PLACEHOLDER_APP_PORT: context.get("app_port", DEFAULT_APP_PORT),
         }
         for placeholder, value in replacements.items():
             content = content.replace(placeholder, value)

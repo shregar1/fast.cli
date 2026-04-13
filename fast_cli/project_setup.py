@@ -15,6 +15,11 @@ import re
 import shutil
 from pathlib import Path
 
+from fast_cli.constants import (
+    ENV_EXAMPLE_FILENAME,
+    ENV_FILENAME,
+    PYPROJECT_FILENAME,
+)
 from fast_cli.output import output
 from fast_cli.template_engine import TemplateRenderer
 
@@ -35,16 +40,16 @@ class ProjectBootstrap:
         bool
             ``True`` if a new ``.env`` was created.
         """
-        example_env = target_path / ".env.example"
-        target_env = target_path / ".env"
+        example_env = target_path / ENV_EXAMPLE_FILENAME
+        target_env = target_path / ENV_FILENAME
         if example_env.exists() and not target_env.exists():
             try:
                 shutil.copy2(example_env, target_env)
                 self._renderer.process_file(target_env, context)
-                output.print_success("Generated .env from .env.example")
+                output.print_success(f"Generated {ENV_FILENAME} from {ENV_EXAMPLE_FILENAME}")
                 return True
             except OSError as e:
-                output.print_warning(f"Could not generate .env: {e}")
+                output.print_warning(f"Could not generate {ENV_FILENAME}: {e}")
         return False
 
     def create_project_structure(self, target_path: Path, context: dict) -> None:
@@ -74,7 +79,7 @@ class ProjectBootstrap:
         Uses regular expressions; complex TOML with nested tables may need
         manual follow-up after generation.
         """
-        pyproject_path = target_path / "pyproject.toml"
+        pyproject_path = target_path / PYPROJECT_FILENAME
         if not pyproject_path.exists():
             return
         try:
@@ -95,6 +100,6 @@ class ProjectBootstrap:
                 r"maintainers = \[[^\]]*\]", f"maintainers = [{authors_str}]", content
             )
             pyproject_path.write_text(content)
-            output.print_success("Updated pyproject.toml")
+            output.print_success(f"Updated {PYPROJECT_FILENAME}")
         except OSError as e:
-            output.print_warning(f"Could not update pyproject.toml: {e}")
+            output.print_warning(f"Could not update {PYPROJECT_FILENAME}: {e}")

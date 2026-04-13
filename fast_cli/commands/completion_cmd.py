@@ -9,6 +9,7 @@ from pathlib import Path
 
 import click
 
+from fast_cli.constants import CLI_ENTRY_POINTS, TIMEOUT_COMPLETION_HELPER
 from fast_cli.output import output
 
 
@@ -38,9 +39,11 @@ def register_completion_command(cli: click.Group) -> None:
         mapping = {"bash": "bash_source", "zsh": "zsh_source", "fish": "fish_source"}
         source = mapping[shell_l]
 
-        exe: str | None = (
-            shutil.which("fast") or shutil.which("fast-cli") or shutil.which("fastmvc")
-        )
+        exe: str | None = None
+        for entry_point in CLI_ENTRY_POINTS:
+            exe = shutil.which(entry_point)
+            if exe:
+                break
         if not exe:
             output.print_error(
                 "Could not find 'fast', 'fast-cli', or 'fastmvc' on PATH."
@@ -58,7 +61,7 @@ def register_completion_command(cli: click.Group) -> None:
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=TIMEOUT_COMPLETION_HELPER,
             )
         except (OSError, subprocess.TimeoutExpired) as e:
             output.print_error(f"Could not run completion helper: {e}")

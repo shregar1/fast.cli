@@ -13,6 +13,7 @@ files each count as one item), matching the legacy CLI behaviour.
 from __future__ import annotations
 
 import shutil
+from collections.abc import Callable
 from pathlib import Path
 
 from rich.progress import (
@@ -26,6 +27,32 @@ from rich.progress import (
 
 from fast_cli.output import output
 from fast_cli.template_engine import TemplateRenderer
+
+
+def template_copytree_ignore(
+    copy_root: Path,
+) -> Callable[[str, list[str]], set[str]]:
+    """Build a :func:`shutil.copytree` ``ignore`` callable for template directories.
+
+    Skips the usual VCS/cache junk and, when the tree root is named ``tests``,
+    omits ``tests/framework`` (framework-internal pytest suite — not for generated
+    apps).
+    """
+
+    std = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".DS_Store")
+    root_resolved = copy_root.resolve()
+
+    def ignore(dirpath: str, names: list[str]) -> set[str]:
+        ignored = set(std(dirpath, names))
+        if (
+            Path(dirpath).resolve() == root_resolved
+            and copy_root.name == "tests"
+            and "framework" in names
+        ):
+            ignored.add("framework")
+        return ignored
+
+    return ignore
 
 
 class ProjectCopier:
@@ -77,9 +104,7 @@ class ProjectCopier:
                         shutil.copytree(
                             source_path,
                             target_item_path,
-                            ignore=shutil.ignore_patterns(
-                                ".git", "__pycache__", "*.pyc", ".DS_Store"
-                            ),
+                            ignore=template_copytree_ignore(source_path),
                         )
                     else:
                         shutil.copy2(source_path, target_item_path)

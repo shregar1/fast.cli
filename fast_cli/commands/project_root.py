@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from fast_cli.constants import FRAMEWORK_PACKAGE_NAME, PYPROJECT_FILENAME
+
 
 def resolve_fastmvc_project_root(cwd: Path | None = None) -> Path:
     """Return the directory that contains framework code for the current project.
@@ -22,13 +24,13 @@ def resolve_fastmvc_project_root(cwd: Path | None = None) -> Path:
     Returns
     -------
     pathlib.Path
-        ``cwd / "fast_mvc"`` when ``pyproject.toml`` is missing but ``fast_mvc``
+        ``cwd / FRAMEWORK_PACKAGE_NAME`` when ``PYPROJECT_FILENAME`` is missing but ``fast_mvc``
         exists in ``cwd``; otherwise ``cwd`` unchanged.
     """
     target = cwd or Path.cwd()
     if (
-        not (target / "pyproject.toml").exists()
-        and (target / "fast_mvc").exists()
+        not (target / PYPROJECT_FILENAME).exists()
+        and (target / FRAMEWORK_PACKAGE_NAME).exists()
     ):
-        return target / "fast_mvc"
+        return target / FRAMEWORK_PACKAGE_NAME
     return target

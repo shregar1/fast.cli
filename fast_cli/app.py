@@ -23,6 +23,7 @@ from __future__ import annotations
 import click
 
 from fast_cli import __version__
+from fast_cli.constants import CLI_MAX_CONTENT_WIDTH, CLI_PROG_NAME
 from fast_cli.commands.add_cmd import add_group
 from fast_cli.commands.cache_cmd import cache_group
 from fast_cli.commands.checkpoint_cmd import register_checkpoint_command
@@ -40,7 +41,7 @@ from fast_cli.commands.tasks_cmd import tasks_group
 @click.group(
     context_settings={
         "help_option_names": ["-h", "--help"],
-        "max_content_width": 92,
+        "max_content_width": CLI_MAX_CONTENT_WIDTH,
     },
 )
 @click.version_option(version=__version__, prog_name="fast")
