@@ -31,10 +31,10 @@ dependencies = [
     "pyyaml>=6.0",
     "tomli>=2.0.0; python_version < '3.11'",
     "rich>=13.0",
-    "fast-platform>=1.5.0",
-    "fast-middleware>=1.5.0",
-    "fast-database>=1.5.0",
-    "fast-dashboards>=1.5.0",
+    "fastx-platform>=1.5.0",
+    "fastx-middleware>=1.5.0",
+    "fastx-database>=1.5.0",
+    "fastx-dashboards>=1.5.0",
     "fastx-mvc>=1.5.0",
 ]
 
@@ -54,10 +54,10 @@ dev = [
 ]
 all = [
     "fastmvc-cli[interactive,dev]",
-    "fast-platform[all]",
-    "fast-middleware",
-    "fast-database",
-    "fast-dashboards",
+    "fastx-platform[all]",
+    "fastx-middleware",
+    "fastx-database",
+    "fastx-dashboards",
     "fastx-mvc[all,dev,docs,interactive]",
 ]
 
