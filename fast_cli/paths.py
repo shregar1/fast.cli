@@ -59,7 +59,7 @@ class FrameworkSourceLocator:
             self._package_dir / FRAMEWORK_PACKAGE_NAME,
         ]
         for path in candidates:
-            if path.exists() and (path / "app.py").exists():
+            if path.exists():
                 return path
         return candidates[0]
 
