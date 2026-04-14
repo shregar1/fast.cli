@@ -52,12 +52,16 @@ class FrameworkSourceLocator:
             without a local ``fast_mvc`` checkout; callers should handle empty
             template lists.
         """
-        fastmvc_dir = self.repo_root / FRAMEWORK_PACKAGE_NAME
-        if not fastmvc_dir.exists():
-            for path in (Path.cwd() / FRAMEWORK_PACKAGE_NAME, self._package_dir / FRAMEWORK_PACKAGE_NAME):
-                if path.exists():
-                    return path
-        return fastmvc_dir
+        candidates = [
+            self.repo_root / FRAMEWORK_PACKAGE_NAME,
+            self.repo_root.parent / FRAMEWORK_PACKAGE_NAME,
+            Path.cwd() / FRAMEWORK_PACKAGE_NAME,
+            self._package_dir / FRAMEWORK_PACKAGE_NAME,
+        ]
+        for path in candidates:
+            if path.exists() and (path / "app.py").exists():
+                return path
+        return candidates[0]
 
     def list_existing_template_items(self) -> list[str]:
         """Return only template entries that exist under :meth:`fast_mvc_root`."""
