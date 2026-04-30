@@ -31,10 +31,13 @@ from fastx_cli.commands.commit_history_setup import register_commit_history_setu
 from fastx_cli.commands.completion_cmd import register_completion_command
 from fastx_cli.commands.db_cmd import db_group
 from fastx_cli.commands.decimate_cmd import register_decimate_command
+from fastx_cli.commands.deploy_cmd import deploy_group
+from fastx_cli.commands.dev_cmd import register_dev_command
 from fastx_cli.commands.docs_cmd import docs_group
 from fastx_cli.commands.doctor_cmd import register_doctor_commands
 from fastx_cli.commands.generate_cmd import register_generate_commands
 from fastx_cli.commands.misc_cmd import register_misc_commands
+from fastx_cli.commands.sdk_cmd import sdk_group
 from fastx_cli.commands.tasks_cmd import tasks_group
 
 
@@ -53,6 +56,7 @@ def cli() -> None:
         generate, new       Create a project (interactive or --name/--path)
         quickstart          Create a project with defaults
         add resource        Scaffold DTOs, services, and API layers
+        dev                 Start dev server with auto-reload and optional tunnel
         env                 Generate .env from .env.example
 
     \b
@@ -103,6 +107,7 @@ register_generate_commands(cli)
 register_misc_commands(cli)
 register_commit_history_setup(cli)
 register_decimate_command(cli)
+register_dev_command(cli)
 register_doctor_commands(cli)
 register_checkpoint_command(cli)
 register_completion_command(cli)
@@ -110,7 +115,9 @@ cli.add_command(docs_group)
 cli.add_command(db_group, name="db")
 cli.add_command(add_group, name="add")
 cli.add_command(cache_group)
+cli.add_command(sdk_group, name="sdk")
 cli.add_command(tasks_group)
+cli.add_command(deploy_group, name="deploy")
 
 
 def main() -> None:
