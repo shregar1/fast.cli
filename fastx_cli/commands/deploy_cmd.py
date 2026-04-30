@@ -289,6 +289,265 @@ echo "=== Done! ==="
     output.console.print(f"  4. Run: [dim]./deploy/aws/deploy.sh[/dim]")
 
 
+@deploy_group.command(name="gcp")
+@click.option("--app-name", "-n", default=None, help="Cloud Run service name")
+@click.option("--region", "-r", default="us-central1", help="GCP region")
+@click.option("--project", "-p", default=None, help="GCP project ID")
+@click.option("--memory", default="512Mi", help="Memory limit (e.g. 512Mi, 1Gi)")
+@click.option("--cpu", default="1", help="CPU limit (1, 2, 4)")
+@click.option("--min-instances", default=0, type=int, help="Minimum instances (0 = scale to zero)")
+@click.option("--max-instances", default=10, type=int, help="Maximum instances")
+def deploy_gcp(
+    app_name: str | None,
+    region: str,
+    project: str | None,
+    memory: str,
+    cpu: str,
+    min_instances: int,
+    max_instances: int,
+) -> None:
+    """Deploy to Google Cloud Run.
+
+    \b
+    Prerequisites:
+        brew install google-cloud-sdk
+        gcloud auth login
+        gcloud config set project <PROJECT_ID>
+
+    \b
+    Example:
+        fastx deploy gcp --app-name my-api --project my-gcp-project
+        fastx deploy gcp --region europe-west1 --memory 1Gi --cpu 2
+    """
+    root = resolve_fastmvc_project_root(Path.cwd())
+    name = app_name or root.name.replace("_", "-")
+
+    if not _command_exists("gcloud"):
+        output.console.print("[red]gcloud CLI not found. Install: brew install google-cloud-sdk[/red]")
+        return
+
+    _ensure_dockerfile(root)
+
+    # Generate Cloud Run service YAML
+    deploy_dir = root / "deploy" / "gcp"
+    deploy_dir.mkdir(parents=True, exist_ok=True)
+
+    service_yaml = deploy_dir / "service.yaml"
+    project_id = project or "<PROJECT_ID>"
+    service_yaml.write_text(f"""apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: {name}
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "{min_instances}"
+        autoscaling.knative.dev/maxScale: "{max_instances}"
+    spec:
+      containerConcurrency: 80
+      containers:
+        - image: gcr.io/{project_id}/{name}:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              memory: {memory}
+              cpu: "{cpu}"
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: 15
+""")
+    output.console.print(f"[green]✓[/green] {service_yaml.relative_to(root)}")
+
+    # Generate deploy script
+    deploy_script = deploy_dir / "deploy.sh"
+    deploy_script.write_text(f'''#!/bin/bash
+set -euo pipefail
+
+APP_NAME="{name}"
+REGION="{region}"
+PROJECT="{project_id}"
+TAG="${{GIT_SHA:-latest}}"
+
+echo "=== Building and pushing to GCR ==="
+gcloud builds submit --tag "gcr.io/$PROJECT/$APP_NAME:$TAG" .
+
+echo "=== Deploying to Cloud Run ==="
+gcloud run deploy "$APP_NAME" \\
+    --image "gcr.io/$PROJECT/$APP_NAME:$TAG" \\
+    --platform managed \\
+    --region "$REGION" \\
+    --port 8000 \\
+    --memory {memory} \\
+    --cpu {cpu} \\
+    --min-instances {min_instances} \\
+    --max-instances {max_instances} \\
+    --allow-unauthenticated
+
+echo "=== Service URL ==="
+gcloud run services describe "$APP_NAME" --region "$REGION" --format "value(status.url)"
+''')
+    deploy_script.chmod(0o755)
+    output.console.print(f"[green]✓[/green] {deploy_script.relative_to(root)}")
+
+    output.console.print(f"\n[bold]Next steps:[/bold]")
+    if project is None:
+        output.console.print(f"  1. Set your project: [dim]gcloud config set project <PROJECT_ID>[/dim]")
+        output.console.print(f"  2. Update PROJECT in deploy/gcp/deploy.sh")
+        output.console.print(f"  3. Run: [dim]./deploy/gcp/deploy.sh[/dim]")
+    else:
+        output.console.print(f"  1. Run: [dim]./deploy/gcp/deploy.sh[/dim]")
+
+
+@deploy_group.command(name="azure")
+@click.option("--app-name", "-n", default=None, help="Container App name")
+@click.option("--region", "-r", default="eastus", help="Azure region")
+@click.option("--resource-group", "-g", default=None, help="Resource group name")
+@click.option("--registry", default=None, help="Azure Container Registry name (e.g. myregistry.azurecr.io)")
+@click.option("--cpu", default="0.5", help="CPU cores (0.25, 0.5, 1, 2, 4)")
+@click.option("--memory", default="1.0Gi", help="Memory (e.g. 0.5Gi, 1.0Gi, 2.0Gi)")
+@click.option("--min-replicas", default=0, type=int, help="Minimum replicas (0 = scale to zero)")
+@click.option("--max-replicas", default=10, type=int, help="Maximum replicas")
+def deploy_azure(
+    app_name: str | None,
+    region: str,
+    resource_group: str | None,
+    registry: str | None,
+    cpu: str,
+    memory: str,
+    min_replicas: int,
+    max_replicas: int,
+) -> None:
+    """Deploy to Azure Container Apps.
+
+    \b
+    Prerequisites:
+        brew install azure-cli
+        az login
+        az extension add --name containerapp
+
+    \b
+    Example:
+        fastx deploy azure --app-name my-api --resource-group my-rg
+        fastx deploy azure --registry myregistry.azurecr.io --cpu 1 --memory 2.0Gi
+    """
+    root = resolve_fastmvc_project_root(Path.cwd())
+    name = app_name or root.name.replace("_", "-")
+
+    if not _command_exists("az"):
+        output.console.print("[red]Azure CLI not found. Install: brew install azure-cli[/red]")
+        return
+
+    _ensure_dockerfile(root)
+
+    rg = resource_group or f"{name}-rg"
+    acr = registry or f"<REGISTRY_NAME>.azurecr.io"
+
+    # Generate Azure Container App config
+    deploy_dir = root / "deploy" / "azure"
+    deploy_dir.mkdir(parents=True, exist_ok=True)
+
+    container_app_yaml = deploy_dir / "container-app.yaml"
+    container_app_yaml.write_text(f"""name: {name}
+resourceGroup: {rg}
+location: {region}
+properties:
+  configuration:
+    ingress:
+      external: true
+      targetPort: 8000
+      transport: auto
+    registries:
+      - server: {acr}
+  template:
+    containers:
+      - name: {name}
+        image: {acr}/{name}:latest
+        resources:
+          cpu: {cpu}
+          memory: {memory}
+        probes:
+          - type: liveness
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: 15
+          - type: readiness
+            httpGet:
+              path: /health/ready
+              port: 8000
+            periodSeconds: 10
+          - type: startup
+            httpGet:
+              path: /health/live
+              port: 8000
+            failureThreshold: 3
+            periodSeconds: 10
+    scale:
+      minReplicas: {min_replicas}
+      maxReplicas: {max_replicas}
+""")
+    output.console.print(f"[green]✓[/green] {container_app_yaml.relative_to(root)}")
+
+    # Generate deploy script
+    deploy_script = deploy_dir / "deploy.sh"
+    deploy_script.write_text(f'''#!/bin/bash
+set -euo pipefail
+
+APP_NAME="{name}"
+REGION="{region}"
+RESOURCE_GROUP="{rg}"
+ACR="{acr}"
+TAG="${{GIT_SHA:-latest}}"
+
+echo "=== Ensuring resource group ==="
+az group create --name "$RESOURCE_GROUP" --location "$REGION" 2>/dev/null || true
+
+echo "=== Building and pushing to ACR ==="
+az acr build --registry "${{ACR%%.*}}" --image "$APP_NAME:$TAG" .
+
+echo "=== Creating/Updating Container App ==="
+az containerapp up \\
+    --name "$APP_NAME" \\
+    --resource-group "$RESOURCE_GROUP" \\
+    --location "$REGION" \\
+    --image "$ACR/$APP_NAME:$TAG" \\
+    --target-port 8000 \\
+    --ingress external \\
+    --cpu {cpu} \\
+    --memory {memory} \\
+    --min-replicas {min_replicas} \\
+    --max-replicas {max_replicas}
+
+echo "=== Application URL ==="
+az containerapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" \\
+    --query "properties.configuration.ingress.fqdn" -o tsv
+''')
+    deploy_script.chmod(0o755)
+    output.console.print(f"[green]✓[/green] {deploy_script.relative_to(root)}")
+
+    output.console.print(f"\n[bold]Next steps:[/bold]")
+    steps = []
+    if registry is None:
+        steps.append(f"  Create ACR: [dim]az acr create --name <registry> --resource-group {rg} --sku Basic[/dim]")
+        steps.append(f"  Update ACR in deploy/azure/deploy.sh")
+    steps.append(f"  Run: [dim]./deploy/azure/deploy.sh[/dim]")
+    for i, step in enumerate(steps, 1):
+        output.console.print(f"  {i}. {step}")
+
+
 def _command_exists(cmd: str) -> bool:
     """Check if a shell command is available."""
     try:
