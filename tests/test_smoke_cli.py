@@ -1,4 +1,4 @@
-"""Subprocess smoke tests: real ``python -m fast_cli.app`` invocations.
+"""Subprocess smoke tests: real ``python -m fastx_cli.app`` invocations.
 
 These complement unit tests by exercising entry points, env handling (``NO_COLOR``),
 and minimal installs closer to how users run the CLI. Kept small so CI can run them
@@ -23,7 +23,7 @@ def _run(
 ) -> subprocess.CompletedProcess[str]:
     env = {**os.environ, **(extra_env or {})}
     return subprocess.run(
-        [sys.executable, "-m", "fast_cli.app", *args],
+        [sys.executable, "-m", "fastx_cli.app", *args],
         check=check,
         capture_output=True,
         text=True,
@@ -91,4 +91,4 @@ def test_entry_point_console_scripts_resolve() -> None:
         )
         assert p.returncode == 0
         return
-    pytest.skip("Console scripts not on PATH (use python -m fast_cli.app)")
+    pytest.skip("Console scripts not on PATH (use python -m fastx_cli.app)")

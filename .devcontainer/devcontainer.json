@@ -1,7 +1,7 @@
 {
   "name": "fastmvc-cli",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  "workspaceFolder": "/workspaces/fast_cli",
+  "workspaceFolder": "/workspaces/fastx_cli",
   "postCreateCommand": "pip install --upgrade pip && pip install -e '.[dev]'",
   "customizations": {
     "vscode": {

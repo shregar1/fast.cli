@@ -63,11 +63,11 @@ all = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --cov=fast_cli --cov-report=term-missing --cov-fail-under=99"
+addopts = "-q --cov=fastx_cli --cov-report=term-missing --cov-fail-under=99"
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
-source = ["fast_cli"]
+source = ["fastx_cli"]
 branch = false
 
 [tool.coverage.report]
@@ -79,8 +79,8 @@ exclude_lines = [
 [tool.ruff]
 target-version = "py310"
 line-length = 100
-src = ["fast_cli", "tests"]
-exclude = ["fast_cli/bundled"]
+src = ["fastx_cli", "tests"]
+exclude = ["fastx_cli/bundled"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
@@ -88,40 +88,41 @@ ignore = ["B008", "E501", "B904"]
 
 [tool.mypy]
 python_version = "3.10"
-packages = ["fast_cli"]
+packages = ["fastx_cli"]
 ignore_missing_imports = true
 warn_unused_ignores = true
 show_error_codes = true
 
 [[tool.mypy.overrides]]
-module = "fast_cli.validators"
+module = "fastx_cli.validators"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = "fast_cli.bundled.git_log_recorder"
+module = "fastx_cli.bundled.git_log_recorder"
 ignore_errors = true
 
 [project.urls]
 Homepage = "https://github.com/shregar1/fastMVC"
-Documentation = "https://github.com/shregar1/fastMVC/blob/main/fast_cli/README.md"
+Documentation = "https://github.com/shregar1/fastMVC/blob/main/fastx_cli/README.md"
 Repository = "https://github.com/shregar1/fastMVC"
-Changelog = "https://github.com/shregar1/fastMVC/blob/main/fast_cli/CHANGELOG.md"
+Changelog = "https://github.com/shregar1/fastMVC/blob/main/fastx_cli/CHANGELOG.md"
 
 [project.scripts]
-fast = "fast_cli.app:main"
-fast-cli = "fast_cli.app:main"
-fastmvc = "fast_cli.app:main"
+fastx = "fastx_cli.app:main"
+fast = "fastx_cli.app:main"
+fastx-cli = "fastx_cli.app:main"
+fastmvc = "fastx_cli.app:main"
 
 [tool.hatch.version]
-path = "fast_cli/__init__.py"
+path = "fastx_cli/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["fast_cli"]
+packages = ["fastx_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/pyproject.toml",
-    "/fast_cli",
+    "/fastx_cli",
     "/README.md",
     "/LICENSE",
     "/CHANGELOG.md",

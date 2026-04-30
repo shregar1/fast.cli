@@ -5,7 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-from fast_cli.output import CliOutput, _use_compact_banner
+from fastx_cli.output import CliOutput, _use_compact_banner
 from rich.console import Console
 
 

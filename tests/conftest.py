@@ -20,7 +20,7 @@ def alembic_ready(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """``alembic.ini`` + cwd + ``alembic`` on PATH for db command tests."""
     monkeypatch.chdir(tmp_path)
     (tmp_path / "alembic.ini").write_text("[alembic]\n")
-    with patch("fast_cli.commands.db_cmd.shutil.which", return_value="/bin/alembic"):
+    with patch("fastx_cli.commands.db_cmd.shutil.which", return_value="/bin/alembic"):
         yield tmp_path
 
 

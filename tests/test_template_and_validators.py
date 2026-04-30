@@ -1,4 +1,4 @@
-"""Tests for :mod:`fast_cli.template_engine` and :mod:`fast_cli.validators`."""
+"""Tests for :mod:`fastx_cli.template_engine` and :mod:`fastx_cli.validators`."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from fast_cli.template_engine import TemplateRenderer
+from fastx_cli.template_engine import TemplateRenderer
 
 
 def _ctx() -> dict:
@@ -54,7 +54,7 @@ def test_template_renderer_read_error(tmp_path: Path) -> None:
 
 def test_validators_with_questionary() -> None:
     pytest.importorskip("questionary")
-    from fast_cli.validators import (
+    from fastx_cli.validators import (
         HAS_QUESTIONARY,
         EmailValidator,
         PathValidator,
@@ -103,7 +103,7 @@ def _imp(name, *a, **kw):
         raise ImportError("blocked")
     return _real(name, *a, **kw)
 builtins.__import__ = _imp
-import fast_cli.validators as v
+import fastx_cli.validators as v
 assert v.HAS_QUESTIONARY is False
 assert v.EmailValidator.__doc__ is not None
 """

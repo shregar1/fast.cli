@@ -6,10 +6,10 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from fast_cli.github_workflows import GitHubWorkflowsCopier
-from fast_cli.gitignore import GitignoreUpdater
-from fast_cli.precommit import PreCommitInstaller
-from fast_cli.venv import VirtualEnvironmentService
+from fastx_cli.github_workflows import GitHubWorkflowsCopier
+from fastx_cli.gitignore import GitignoreUpdater
+from fastx_cli.precommit import PreCommitInstaller
+from fastx_cli.venv import VirtualEnvironmentService
 
 
 def test_github_workflows_missing_templates(tmp_path: Path) -> None:
@@ -45,7 +45,7 @@ def test_github_workflows_oserror(tmp_path: Path) -> None:
     c = GitHubWorkflowsCopier(repo_root=root)
     proj = tmp_path / "proj"
     proj.mkdir()
-    with patch("fast_cli.github_workflows.shutil.copy2", side_effect=OSError("e")):
+    with patch("fastx_cli.github_workflows.shutil.copy2", side_effect=OSError("e")):
         assert c.copy_into_project(proj, {}) is False
 
 
@@ -77,13 +77,13 @@ def test_venv_activation_commands() -> None:
 
 
 def test_venv_create_success(tmp_path: Path) -> None:
-    with patch("fast_cli.venv.subprocess.run") as run:
+    with patch("fastx_cli.venv.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         assert VirtualEnvironmentService().create(tmp_path, ".venv") is True
 
 
 def test_venv_create_failure(tmp_path: Path) -> None:
-    with patch("fast_cli.venv.subprocess.run") as run:
+    with patch("fastx_cli.venv.subprocess.run") as run:
         run.return_value = MagicMock(returncode=1, stderr="err")
         assert VirtualEnvironmentService().create(tmp_path, ".venv") is False
 
@@ -92,19 +92,19 @@ def test_venv_create_timeout(tmp_path: Path) -> None:
     import subprocess as sp
 
     with patch(
-        "fast_cli.venv.subprocess.run",
+        "fastx_cli.venv.subprocess.run",
         side_effect=sp.TimeoutExpired("x", 1),
     ):
         assert VirtualEnvironmentService().create(tmp_path, ".venv") is False
 
 
 def test_venv_create_file_not_found(tmp_path: Path) -> None:
-    with patch("fast_cli.venv.subprocess.run", side_effect=FileNotFoundError()):
+    with patch("fastx_cli.venv.subprocess.run", side_effect=FileNotFoundError()):
         assert VirtualEnvironmentService().create(tmp_path, ".venv") is False
 
 
 def test_venv_create_oserror(tmp_path: Path) -> None:
-    with patch("fast_cli.venv.subprocess.run", side_effect=OSError("e")):
+    with patch("fastx_cli.venv.subprocess.run", side_effect=OSError("e")):
         assert VirtualEnvironmentService().create(tmp_path, ".venv") is False
 
 
@@ -122,7 +122,7 @@ def test_venv_install_success(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pip.chmod(0o755)
-    with patch("fast_cli.venv.subprocess.run") as run:
+    with patch("fastx_cli.venv.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         assert VirtualEnvironmentService().install_requirements(tmp_path, ".venv") is True
 
@@ -137,7 +137,7 @@ def test_venv_install_failure(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pip.chmod(0o755)
-    with patch("fast_cli.venv.subprocess.run") as run:
+    with patch("fastx_cli.venv.subprocess.run") as run:
         run.return_value = MagicMock(returncode=1, stderr="e")
         assert VirtualEnvironmentService().install_requirements(tmp_path, ".venv") is False
 
@@ -161,7 +161,7 @@ def test_precommit_install_flow(tmp_path: Path) -> None:
     pip.chmod(0o755)
     pc.write_text("")
     pc.chmod(0o755)
-    with patch("fast_cli.precommit.subprocess.run") as run:
+    with patch("fastx_cli.precommit.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         assert PreCommitInstaller().install(tmp_path, ".venv") is True
 
@@ -177,7 +177,7 @@ def test_precommit_pip_fail(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pip.chmod(0o755)
-    with patch("fast_cli.precommit.subprocess.run") as run:
+    with patch("fastx_cli.precommit.subprocess.run") as run:
         run.return_value = MagicMock(returncode=1, stderr="e")
         assert PreCommitInstaller().install(tmp_path, ".venv") is False
 
@@ -204,5 +204,5 @@ def test_precommit_install_cmd_fail(tmp_path: Path) -> None:
             return MagicMock(returncode=1, stderr="bad")
         return MagicMock(returncode=0)
 
-    with patch("fast_cli.precommit.subprocess.run", side_effect=side_effect):
+    with patch("fastx_cli.precommit.subprocess.run", side_effect=side_effect):
         assert PreCommitInstaller().install(tmp_path, ".venv") is False

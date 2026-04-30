@@ -10,7 +10,7 @@ from unittest.mock import patch
 import click
 import pytest
 from click.testing import CliRunner
-from fast_cli.app import cli
+from fastx_cli.app import cli
 
 
 def _git_init_with_commit(repo: Path) -> None:
@@ -222,7 +222,7 @@ def test_checkpoint_list_skips_non_dict(
 
 
 def test_run_git_failure(monkeypatch: pytest.MonkeyPatch) -> None:
-    from fast_cli.commands import checkpoint_cmd as cc
+    from fastx_cli.commands import checkpoint_cmd as cc
 
     def _fake(*_a: object, **_k: object) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(["git"], 1, "", "git error")
@@ -233,7 +233,7 @@ def test_run_git_failure(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_atomic_write_json_oserror(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    from fast_cli.commands import checkpoint_cmd as cc
+    from fastx_cli.commands import checkpoint_cmd as cc
 
     def _boom(*_a: object, **_k: object) -> None:
         raise OSError("disk full")
@@ -244,7 +244,7 @@ def test_atomic_write_json_oserror(tmp_path: Path, monkeypatch: pytest.MonkeyPat
 
 
 def test_load_checkpoint_missing_checkpoints_key(tmp_path: Path) -> None:
-    from fast_cli.commands.checkpoint_cmd import _load_checkpoint_file
+    from fastx_cli.commands.checkpoint_cmd import _load_checkpoint_file
 
     p = tmp_path / "checkpoint.json"
     p.write_text("{}", encoding="utf-8")
@@ -267,7 +267,7 @@ def test_checkpoint_revert_empty_git_commit(
 
 
 def test_atomic_write_replace_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    from fast_cli.commands import checkpoint_cmd as cc
+    from fastx_cli.commands import checkpoint_cmd as cc
 
     def _bad_replace(_self: Path, _target: object) -> None:
         raise OSError("replace failed")
@@ -292,7 +292,7 @@ def test_checkpoint_revert_execute_git_fails(
             return subprocess.CompletedProcess(cmd, 1, "", "reset failed")
         return real_run(cmd, **kwargs)
 
-    monkeypatch.setattr("fast_cli.commands.checkpoint_cmd.subprocess.run", _fake)
+    monkeypatch.setattr("fastx_cli.commands.checkpoint_cmd.subprocess.run", _fake)
     r = CliRunner().invoke(
         cli, ["checkpoint", "revert", "cp-0001", "--execute", "--yes"]
     )

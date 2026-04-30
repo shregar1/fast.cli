@@ -7,12 +7,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-from fast_cli.app import cli
+from fastx_cli.app import cli
 
 
 def test_make_resource_invokes_add() -> None:
     runner = CliRunner()
-    with patch("fast_cli.commands.misc_cmd.add_resource") as ar:
+    with patch("fastx_cli.commands.misc_cmd.add_resource") as ar:
         r = runner.invoke(cli, ["make", "resource", "--name", "u"])
         assert r.exit_code == 0
         ar.assert_called_once()
@@ -21,7 +21,7 @@ def test_make_resource_invokes_add() -> None:
 def test_make_env_invokes_generate_env() -> None:
     runner = CliRunner()
     with patch(
-        "fast_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
+        "fastx_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
         return_value=True,
     ) as ge:
         r = runner.invoke(cli, ["make", "env"])
@@ -32,7 +32,7 @@ def test_make_env_invokes_generate_env() -> None:
 def test_env_command() -> None:
     runner = CliRunner()
     with patch(
-        "fast_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
+        "fastx_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
         return_value=True,
     ):
         r = runner.invoke(cli, ["env"])
@@ -42,7 +42,7 @@ def test_env_command() -> None:
 def test_env_command_failure() -> None:
     runner = CliRunner()
     with patch(
-        "fast_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
+        "fastx_cli.commands.misc_cmd.ProjectBootstrap.generate_env_file",
         return_value=False,
     ):
         r = runner.invoke(cli, ["env"])
@@ -58,7 +58,7 @@ def test_docs_generate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     (root / "dtos" / "requests" / "apis" / "v1" / "users" / "x.py").write_text("#")
     monkeypatch.chdir(tmp_path)
     with patch(
-        "fast_cli.commands.docs_cmd.resolve_fastmvc_project_root",
+        "fastx_cli.commands.docs_cmd.resolve_fastmvc_project_root",
         return_value=root,
     ):
         r = CliRunner().invoke(cli, ["docs", "generate"])
@@ -67,7 +67,7 @@ def test_docs_generate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_docs_deploy_success() -> None:
     runner = CliRunner()
-    with patch("fast_cli.commands.docs_cmd.subprocess.run") as run:
+    with patch("fastx_cli.commands.docs_cmd.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         r = runner.invoke(cli, ["docs", "deploy", "-m", "m"])
         assert r.exit_code == 0
@@ -76,7 +76,7 @@ def test_docs_deploy_success() -> None:
 def test_docs_deploy_failure() -> None:
     runner = CliRunner()
     with patch(
-        "fast_cli.commands.docs_cmd.subprocess.run",
+        "fastx_cli.commands.docs_cmd.subprocess.run",
         side_effect=RuntimeError("e"),
     ):
         r = runner.invoke(cli, ["docs", "deploy"])
@@ -84,7 +84,7 @@ def test_docs_deploy_failure() -> None:
 
 
 def test_mkdocs_ecosystem_branch(tmp_path: Path) -> None:
-    from fast_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
+    from fastx_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
 
     root = tmp_path / "proj"
     root.mkdir()

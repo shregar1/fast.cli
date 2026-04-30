@@ -1,10 +1,10 @@
-"""Tests for :mod:`fast_cli.generation_ui`."""
+"""Tests for :mod:`fastx_cli.generation_ui`."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from fast_cli.generation_ui import GenerationSummaryPresenter
+from fastx_cli.generation_ui import GenerationSummaryPresenter
 
 
 def test_show_summary_table_long_description() -> None:

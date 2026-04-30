@@ -12,24 +12,24 @@ from unittest.mock import MagicMock, patch
 import click
 import pytest
 from click.testing import CliRunner
-from fast_cli.app import cli
-from fast_cli.bundled import git_log_recorder as glr
-from fast_cli.commands import commit_history_setup as chs
-from fast_cli.gitignore import GitignoreUpdater
-from fast_cli.paths import FrameworkSourceLocator
-from fast_cli.project_generation import ProjectGenerationOrchestrator
-from fast_cli.venv import VirtualEnvironmentService
+from fastx_cli.app import cli
+from fastx_cli.bundled import git_log_recorder as glr
+from fastx_cli.commands import commit_history_setup as chs
+from fastx_cli.gitignore import GitignoreUpdater
+from fastx_cli.paths import FrameworkSourceLocator
+from fastx_cli.project_generation import ProjectGenerationOrchestrator
+from fastx_cli.venv import VirtualEnvironmentService
 
 
 def test_bundled_main_no_repo(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir("/")
-    with patch("fast_cli.bundled.git_log_recorder.get_repo_root", return_value=None):
+    with patch("fastx_cli.bundled.git_log_recorder.get_repo_root", return_value=None):
         glr.main()
 
 
 def test_bundled_main_get_git_none(monkeypatch: pytest.MonkeyPatch, git_repo: Path) -> None:
     monkeypatch.chdir(git_repo)
-    with patch("fast_cli.bundled.git_log_recorder.get_git_info", return_value=None):
+    with patch("fastx_cli.bundled.git_log_recorder.get_git_info", return_value=None):
         glr.main()
 
 
@@ -44,7 +44,7 @@ def test_bundled_run_as_main(git_repo: Path, monkeypatch: pytest.MonkeyPatch) ->
     import runpy
 
     root = Path(__file__).resolve().parents[1]
-    p = root / "fast_cli" / "bundled" / "git_log_recorder.py"
+    p = root / "fastx_cli" / "bundled" / "git_log_recorder.py"
     monkeypatch.chdir(git_repo)
     runpy.run_path(str(p), run_name="__main__")
 
@@ -57,7 +57,7 @@ def test_bundled_module_main(git_repo: Path) -> None:
             sys.executable,
             "-c",
             "import os; os.chdir(os.environ['GIT_REPO']); "
-            "import fast_cli.bundled.git_log_recorder as g; g.main()",
+            "import fastx_cli.bundled.git_log_recorder as g; g.main()",
         ],
         check=True,
         env=env,
@@ -65,7 +65,7 @@ def test_bundled_module_main(git_repo: Path) -> None:
 
 
 def test_template_write_oserror(tmp_path: Path) -> None:
-    from fast_cli.template_engine import TemplateRenderer
+    from fastx_cli.template_engine import TemplateRenderer
 
     p = tmp_path / "f.txt"
     p.write_text("{{PROJECT_NAME}}")
@@ -85,8 +85,8 @@ def test_template_write_oserror(tmp_path: Path) -> None:
 
 
 def test_file_copy_oserror_on_copy2(tmp_path: Path) -> None:
-    from fast_cli.file_copy import ProjectCopier
-    from fast_cli.template_engine import TemplateRenderer
+    from fastx_cli.file_copy import ProjectCopier
+    from fastx_cli.template_engine import TemplateRenderer
 
     src = tmp_path / "s"
     src.mkdir()
@@ -102,12 +102,12 @@ def test_file_copy_oserror_on_copy2(tmp_path: Path) -> None:
         "version": "1",
         "python_version": "3.11",
     }
-    with patch("fast_cli.file_copy.shutil.copy2", side_effect=OSError("e")):
+    with patch("fastx_cli.file_copy.shutil.copy2", side_effect=OSError("e")):
         ProjectCopier(TemplateRenderer()).copy_with_progress(src, tgt, ["f.py"], ctx)
 
 
 def test_github_process_file_error(tmp_path: Path) -> None:
-    from fast_cli.github_workflows import GitHubWorkflowsCopier
+    from fastx_cli.github_workflows import GitHubWorkflowsCopier
 
     root = tmp_path / "r"
     tpl = root / "templates" / "github"
@@ -126,14 +126,14 @@ def test_github_process_file_error(tmp_path: Path) -> None:
     proj = tmp_path / "p"
     proj.mkdir()
     with patch(
-        "fast_cli.github_workflows.TemplateRenderer.process_file",
+        "fastx_cli.github_workflows.TemplateRenderer.process_file",
         side_effect=OSError("e"),
     ):
         assert c.copy_into_project(proj, ctx) is False
 
 
 def test_precommit_windows_paths(tmp_path: Path) -> None:
-    from fast_cli.precommit import PreCommitInstaller
+    from fastx_cli.precommit import PreCommitInstaller
 
     (tmp_path / ".pre-commit-config.yaml").write_text("repos: []\n")
     (tmp_path / ".git").mkdir()
@@ -143,14 +143,14 @@ def test_precommit_windows_paths(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pc.write_text("")
-    with patch("fast_cli.precommit.sys.platform", "win32"):
-        with patch("fast_cli.precommit.subprocess.run") as run:
+    with patch("fastx_cli.precommit.sys.platform", "win32"):
+        with patch("fastx_cli.precommit.subprocess.run") as run:
             run.return_value = MagicMock(returncode=0)
             PreCommitInstaller().install(tmp_path, ".venv")
 
 
 def test_precommit_chdir_oserror(tmp_path: Path) -> None:
-    from fast_cli.precommit import PreCommitInstaller
+    from fastx_cli.precommit import PreCommitInstaller
 
     (tmp_path / ".pre-commit-config.yaml").write_text("repos: []\n")
     (tmp_path / ".git").mkdir()
@@ -160,25 +160,25 @@ def test_precommit_chdir_oserror(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pc.write_text("")
-    with patch("fast_cli.precommit.subprocess.run") as run:
+    with patch("fastx_cli.precommit.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         with patch(
-            "fast_cli.precommit.os.chdir",
+            "fastx_cli.precommit.os.chdir",
             side_effect=[OSError("e"), None],
         ):
             assert PreCommitInstaller().install(tmp_path, ".venv") is False
 
 
 def test_venv_win32_pip(tmp_path: Path) -> None:
-    from fast_cli.venv import VirtualEnvironmentService
+    from fastx_cli.venv import VirtualEnvironmentService
 
     (tmp_path / "requirements.txt").write_text("x")
-    with patch("fast_cli.venv.sys.platform", "win32"):
+    with patch("fastx_cli.venv.sys.platform", "win32"):
         vdir = tmp_path / ".venv"
         pip = vdir / "Scripts" / "pip.exe"
         pip.parent.mkdir(parents=True)
         pip.write_text("")
-        with patch("fast_cli.venv.subprocess.run") as run:
+        with patch("fastx_cli.venv.subprocess.run") as run:
             run.return_value = MagicMock(returncode=0)
             VirtualEnvironmentService().install_requirements(tmp_path, ".venv")
 
@@ -187,7 +187,7 @@ def test_commit_history_install_timeout(tmp_path: Path) -> None:
     import subprocess as sp
 
     with patch(
-        "fast_cli.commands.commit_history_setup.subprocess.run",
+        "fastx_cli.commands.commit_history_setup.subprocess.run",
         side_effect=sp.TimeoutExpired("p", 1),
     ):
         ok, err = chs._install_pre_commit_hooks(tmp_path)
@@ -205,7 +205,7 @@ def test_app_main_block() -> None:
     import runpy
 
     root = Path(__file__).resolve().parents[1]
-    p = root / "fast_cli" / "app.py"
+    p = root / "fastx_cli" / "app.py"
     with patch.object(sys, "argv", ["fast", "--help"]):
         with pytest.raises(SystemExit) as exc:
             runpy.run_path(str(p), run_name="__main__")
@@ -251,7 +251,7 @@ def test_cache_invalidate_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> None:
-    m = types.ModuleType("fast_platform.src.task")
+    m = types.ModuleType("fastx_platform.src.task")
 
     class TaskRegistry:
         @staticmethod
@@ -268,9 +268,9 @@ def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> 
     ft.backend = Backend()
     m.TaskRegistry = TaskRegistry
     m.fast_tasks = ft
-    monkeypatch.setitem(sys.modules, "fast_platform", types.ModuleType("fast_platform"))
-    monkeypatch.setitem(sys.modules, "fast_platform.src", types.ModuleType("fast_platform.src"))
-    monkeypatch.setitem(sys.modules, "fast_platform.src.task", m)
+    monkeypatch.setitem(sys.modules, "fastx_platform", types.ModuleType("fastx_platform"))
+    monkeypatch.setitem(sys.modules, "fastx_platform.src", types.ModuleType("fastx_platform.src"))
+    monkeypatch.setitem(sys.modules, "fastx_platform.src.task", m)
     _sleep_calls: list[int] = []
 
     def _sleep(_: float) -> None:
@@ -278,7 +278,7 @@ def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> 
         if len(_sleep_calls) >= 2:
             raise KeyboardInterrupt()
 
-    monkeypatch.setattr("fast_cli.commands.tasks_cmd.time.sleep", _sleep)
+    monkeypatch.setattr("fastx_cli.commands.tasks_cmd.time.sleep", _sleep)
     r = CliRunner().invoke(cli, ["tasks", "dashboard", "-r", "10000"])
     assert r.exit_code == 0
 
@@ -288,14 +288,14 @@ def test_run_interactive_email_key_sets_author_email_default(
 ) -> None:
     pytest.importorskip("questionary")
     monkeypatch.setattr(
-        "fast_cli.project_generation.load_user_defaults",
+        "fastx_cli.project_generation.load_user_defaults",
         lambda: {"email": "only@e.co"},
     )
     out = tmp_path / "out"
     out.mkdir()
     monkeypatch.chdir(tmp_path)
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
-        with patch("fast_cli.project_generation.questionary") as q:
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", True):
+        with patch("fastx_cli.project_generation.questionary") as q:
             texts = iter(
                 [
                     "projname",
@@ -332,10 +332,10 @@ def test_run_basic_email_default_from_config(
 ) -> None:
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
-        "fast_cli.project_generation.load_user_defaults",
+        "fastx_cli.project_generation.load_user_defaults",
         lambda: {"email": "only@email.com"},
     )
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", False):
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
         with patch.object(
             FrameworkSourceLocator,
             "fast_mvc_root",
@@ -363,8 +363,8 @@ def test_run_basic_email_default_from_config(
                     return False
                 raise AssertionError(msg)
 
-            with patch("fast_cli.project_generation.click.prompt", side_effect=fake_prompt):
-                with patch("fast_cli.project_generation.click.confirm", side_effect=fake_confirm):
+            with patch("fastx_cli.project_generation.click.prompt", side_effect=fake_prompt):
+                with patch("fastx_cli.project_generation.click.confirm", side_effect=fake_confirm):
                     r = CliRunner().invoke(cli, ["generate"])
                     assert r.exit_code != 0
 
@@ -374,8 +374,8 @@ def test_run_interactive_full_wizard(tmp_path: Path, monkeypatch: pytest.MonkeyP
     out = tmp_path / "out"
     out.mkdir()
     monkeypatch.chdir(tmp_path)
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
-        with patch("fast_cli.project_generation.questionary") as q:
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", True):
+        with patch("fastx_cli.project_generation.questionary") as q:
             texts = iter(
                 [
                     "projname",
@@ -410,8 +410,8 @@ def test_run_interactive_cancel_final_confirm(
     out = tmp_path / "out"
     out.mkdir()
     monkeypatch.chdir(tmp_path)
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
-        with patch("fast_cli.project_generation.questionary") as q:
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", True):
+        with patch("fastx_cli.project_generation.questionary") as q:
             texts = iter(
                 [
                     "projname",
@@ -444,8 +444,8 @@ def test_run_interactive_execute_error(
     out = tmp_path / "out"
     out.mkdir()
     monkeypatch.chdir(tmp_path)
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
-        with patch("fast_cli.project_generation.questionary") as q:
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", True):
+        with patch("fastx_cli.project_generation.questionary") as q:
             texts = iter(
                 [
                     "projname",
@@ -479,7 +479,7 @@ def test_run_basic_venv_install(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     src = tmp_path / "src"
     src.mkdir()
     (src / "f.py").write_text("x")
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", False):
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
         with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
@@ -487,7 +487,7 @@ def test_run_basic_venv_install(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
                 return_value=["f.py"],
             ):
                 with patch(
-                    "fast_cli.project_generation.GitHubWorkflowsCopier.copy_into_project",
+                    "fastx_cli.project_generation.GitHubWorkflowsCopier.copy_into_project",
                     return_value=False,
                 ):
                     with patch.object(VirtualEnvironmentService, "create", return_value=True):
@@ -520,9 +520,9 @@ def test_add_resource_version_prefix(tmp_path: Path) -> None:
     (root / "abstractions" / "controller.py").write_text("#")
     runner = CliRunner()
     with patch(
-        "fast_cli.commands.add_cmd.resolve_fastmvc_project_root", return_value=root
+        "fastx_cli.commands.add_cmd.resolve_fastmvc_project_root", return_value=root
     ):
-        with patch("fast_cli.commands.add_cmd.HAS_QUESTIONARY", False):
+        with patch("fastx_cli.commands.add_cmd.HAS_QUESTIONARY", False):
             r = runner.invoke(
                 cli,
                 ["add", "resource", "--folder", "u", "--resource", "g", "--version", "2"],
@@ -531,7 +531,7 @@ def test_add_resource_version_prefix(tmp_path: Path) -> None:
 
 
 def test_docs_skips_init_files(tmp_path: Path) -> None:
-    from fast_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
+    from fastx_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
 
     root = tmp_path / "p"
     (root / "apis" / "v1" / "users").mkdir(parents=True)
@@ -549,7 +549,7 @@ def test_docs_skips_init_files(tmp_path: Path) -> None:
 
 
 def test_docs_ecosystem_no_src(tmp_path: Path) -> None:
-    from fast_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
+    from fastx_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
 
     root = tmp_path / "proj"
     root.mkdir()
@@ -588,7 +588,7 @@ def test_cache_clear_returns_false() -> None:
 
 
 def test_venv_install_timeout(tmp_path: Path) -> None:
-    from fast_cli.venv import VirtualEnvironmentService
+    from fastx_cli.venv import VirtualEnvironmentService
 
     (tmp_path / "requirements.txt").write_text("x")
     vdir = tmp_path / ".venv"
@@ -599,14 +599,14 @@ def test_venv_install_timeout(tmp_path: Path) -> None:
     import subprocess as sp
 
     with patch(
-        "fast_cli.venv.subprocess.run",
+        "fastx_cli.venv.subprocess.run",
         side_effect=sp.TimeoutExpired("p", 1),
     ):
         assert VirtualEnvironmentService().install_requirements(tmp_path, ".venv") is False
 
 
 def test_venv_install_oserror(tmp_path: Path) -> None:
-    from fast_cli.venv import VirtualEnvironmentService
+    from fastx_cli.venv import VirtualEnvironmentService
 
     (tmp_path / "requirements.txt").write_text("x")
     vdir = tmp_path / ".venv"
@@ -614,12 +614,12 @@ def test_venv_install_oserror(tmp_path: Path) -> None:
     pip.parent.mkdir(parents=True)
     pip.write_text("")
     pip.chmod(0o755)
-    with patch("fast_cli.venv.subprocess.run", side_effect=OSError("e")):
+    with patch("fastx_cli.venv.subprocess.run", side_effect=OSError("e")):
         assert VirtualEnvironmentService().install_requirements(tmp_path, ".venv") is False
 
 
 def test_github_mkdir_oserror(tmp_path: Path) -> None:
-    from fast_cli.github_workflows import GitHubWorkflowsCopier
+    from fastx_cli.github_workflows import GitHubWorkflowsCopier
 
     root = tmp_path / "r"
     tpl = root / "templates" / "github"
@@ -649,7 +649,7 @@ def test_github_mkdir_oserror(tmp_path: Path) -> None:
 
 
 def test_docs_ecosystem_skip_items(tmp_path: Path) -> None:
-    from fast_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
+    from fastx_cli.commands.docs_cmd import MkdocsStyleReferenceGenerator
 
     root = tmp_path / "proj"
     root.mkdir()
@@ -697,12 +697,12 @@ def test_tasks_worker_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_platform" or name.startswith("fast_platform."):
-            raise ImportError("no fast_platform")
+        if name == "fastx_platform" or name.startswith("fastx_platform."):
+            raise ImportError("no fastx_platform")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_platform" or k.startswith("fast_platform."):
+        if k == "fastx_platform" or k.startswith("fastx_platform."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "worker"])
@@ -716,12 +716,12 @@ def test_tasks_list_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_platform" or name.startswith("fast_platform."):
-            raise ImportError("no fast_platform")
+        if name == "fastx_platform" or name.startswith("fastx_platform."):
+            raise ImportError("no fastx_platform")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_platform" or k.startswith("fast_platform."):
+        if k == "fastx_platform" or k.startswith("fastx_platform."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "list"])
@@ -735,12 +735,12 @@ def test_tasks_status_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_platform" or name.startswith("fast_platform."):
-            raise ImportError("no fast_platform")
+        if name == "fastx_platform" or name.startswith("fastx_platform."):
+            raise ImportError("no fastx_platform")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_platform" or k.startswith("fast_platform."):
+        if k == "fastx_platform" or k.startswith("fastx_platform."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "status", "tid"])
@@ -754,12 +754,12 @@ def test_tasks_dashboard_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_platform" or name.startswith("fast_platform."):
-            raise ImportError("no fast_platform")
+        if name == "fastx_platform" or name.startswith("fastx_platform."):
+            raise ImportError("no fastx_platform")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_platform" or k.startswith("fast_platform."):
+        if k == "fastx_platform" or k.startswith("fastx_platform."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "dashboard"])

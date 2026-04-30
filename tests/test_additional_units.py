@@ -11,15 +11,15 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 from click.testing import CliRunner
-from fast_cli.app import cli, main
-from fast_cli.commands import commit_history_setup as chs
-from fast_cli.output import CliOutput
+from fastx_cli.app import cli, main
+from fastx_cli.commands import commit_history_setup as chs
+from fastx_cli.output import CliOutput
 from rich.console import Console
 
 
 def test_new_command_invokes_pipeline(tmp_path: Path) -> None:
     with patch(
-        "fast_cli.project_generation.ProjectGenerationOrchestrator._execute_pipeline"
+        "fastx_cli.project_generation.ProjectGenerationOrchestrator._execute_pipeline"
     ) as pipe:
         r = CliRunner().invoke(
             cli,
@@ -38,10 +38,10 @@ def test_new_command_invokes_pipeline(tmp_path: Path) -> None:
 
 
 def test_fast_cli_cli_shim_same_objects() -> None:
-    from fast_cli.app import cli as app_cli
-    from fast_cli.app import main as app_main
-    from fast_cli.cli import cli as shim_cli
-    from fast_cli.cli import main as shim_main
+    from fastx_cli.app import cli as app_cli
+    from fastx_cli.app import main as app_main
+    from fastx_cli.cli import cli as shim_cli
+    from fastx_cli.cli import main as shim_main
 
     assert app_cli is shim_cli
     assert app_main is shim_main
@@ -49,7 +49,7 @@ def test_fast_cli_cli_shim_same_objects() -> None:
 
 def test_main_delegates_to_root_cli() -> None:
     """``main()`` must call the root group with no stray ``sys.argv`` from pytest."""
-    with patch("fast_cli.app.cli") as mock_cli:
+    with patch("fastx_cli.app.cli") as mock_cli:
         main()
     mock_cli.assert_called_once_with()
 
@@ -73,7 +73,7 @@ def test_python_m_fast_cli_help() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     env = {**os.environ, "PYTHONPATH": str(repo_root)}
     r = subprocess.run(
-        [sys.executable, "-m", "fast_cli", "--help"],
+        [sys.executable, "-m", "fastx_cli", "--help"],
         capture_output=True,
         text=True,
         timeout=30,
@@ -144,7 +144,7 @@ def test_write_pre_commit_config_yaml_list_root(tmp_path: Path) -> None:
 
 
 def test_install_pre_commit_hooks_post_fails(tmp_path: Path) -> None:
-    with patch("fast_cli.commands.commit_history_setup.subprocess.run") as run:
+    with patch("fastx_cli.commands.commit_history_setup.subprocess.run") as run:
         run.side_effect = [
             MagicMock(returncode=0, stderr=""),
             MagicMock(returncode=1, stderr="post failed"),
@@ -186,7 +186,7 @@ def test_setup_commit_log_with_common_hooks_cli(git_repo: Path) -> None:
 
 
 def test_decimate_unlink_file_oserror(tmp_path: Path) -> None:
-    from fast_cli.commands.decimate_cmd import ArtifactDecimator
+    from fastx_cli.commands.decimate_cmd import ArtifactDecimator
 
     f = tmp_path / "junk.pyc"
     f.write_bytes(b"x")

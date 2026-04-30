@@ -1,4 +1,4 @@
-"""Tests for :mod:`fast_cli.bundled.git_log_recorder`."""
+"""Tests for :mod:`fastx_cli.bundled.git_log_recorder`."""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from fast_cli.bundled import git_log_recorder as glr
+from fastx_cli.bundled import git_log_recorder as glr
 
 
 def test_get_repo_root_success() -> None:
     with patch(
-        "fast_cli.bundled.git_log_recorder.subprocess.check_output",
+        "fastx_cli.bundled.git_log_recorder.subprocess.check_output",
         return_value=b"/repo\n",
     ):
         assert glr.get_repo_root() == Path("/repo")
@@ -21,7 +21,7 @@ def test_get_repo_root_success() -> None:
 
 def test_get_repo_root_failure() -> None:
     with patch(
-        "fast_cli.bundled.git_log_recorder.subprocess.check_output",
+        "fastx_cli.bundled.git_log_recorder.subprocess.check_output",
         side_effect=sp.CalledProcessError(1, "git"),
     ):
         assert glr.get_repo_root() is None
@@ -36,7 +36,7 @@ def test_get_git_info_success(git_repo: Path, monkeypatch: pytest.MonkeyPatch) -
 
 def test_get_git_info_error() -> None:
     with patch(
-        "fast_cli.bundled.git_log_recorder.subprocess.check_output",
+        "fastx_cli.bundled.git_log_recorder.subprocess.check_output",
         side_effect=RuntimeError("boom"),
     ):
         assert glr.get_git_info() is None

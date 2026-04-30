@@ -6,10 +6,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from click.testing import CliRunner
-from fast_cli.app import cli
-from fast_cli.commands.decimate_cmd import ArtifactDecimator
-from fast_cli.file_copy import ProjectCopier, template_copytree_ignore
-from fast_cli.project_setup import ProjectBootstrap
+from fastx_cli.app import cli
+from fastx_cli.commands.decimate_cmd import ArtifactDecimator
+from fastx_cli.file_copy import ProjectCopier, template_copytree_ignore
+from fastx_cli.project_setup import ProjectBootstrap
 
 
 def _ctx() -> dict:
@@ -80,7 +80,7 @@ def test_project_copier_oserror(tmp_path: Path) -> None:
     copier = ProjectCopier()
     tgt = tmp_path / "tgt"
     tgt.mkdir()
-    with patch("fast_cli.file_copy.shutil.copy2", side_effect=OSError("e")):
+    with patch("fastx_cli.file_copy.shutil.copy2", side_effect=OSError("e")):
         copier.copy_with_progress(src, tgt, ["missing"], _ctx())
 
 
@@ -101,7 +101,7 @@ def test_bootstrap_generate_env_exists(tmp_path: Path) -> None:
 def test_bootstrap_generate_env_copy_error(tmp_path: Path) -> None:
     b = ProjectBootstrap()
     (tmp_path / ".env.example").write_text("x")
-    with patch("fast_cli.project_setup.shutil.copy2", side_effect=OSError("e")):
+    with patch("fastx_cli.project_setup.shutil.copy2", side_effect=OSError("e")):
         assert b.generate_env_file(tmp_path, _ctx()) is False
 
 
@@ -166,7 +166,7 @@ def test_decimate_pycache_alias(tmp_path: Path) -> None:
 def test_decimate_delete_failure(tmp_path: Path) -> None:
     d = tmp_path / "__pycache__"
     d.mkdir()
-    with patch("fast_cli.commands.decimate_cmd.shutil.rmtree", side_effect=OSError("e")):
+    with patch("fastx_cli.commands.decimate_cmd.shutil.rmtree", side_effect=OSError("e")):
         ArtifactDecimator("python", tmp_path).run()
 
 

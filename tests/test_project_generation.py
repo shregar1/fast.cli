@@ -1,4 +1,4 @@
-"""Tests for :mod:`fast_cli.project_generation`."""
+"""Tests for :mod:`fastx_cli.project_generation`."""
 
 from __future__ import annotations
 
@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-from fast_cli.app import cli
-from fast_cli.paths import FrameworkSourceLocator
-from fast_cli.project_generation import ProjectGenerationOrchestrator
-from fast_cli.venv import VirtualEnvironmentService
+from fastx_cli.app import cli
+from fastx_cli.paths import FrameworkSourceLocator
+from fastx_cli.project_generation import ProjectGenerationOrchestrator
+from fastx_cli.venv import VirtualEnvironmentService
 
 
 def test_execute_pipeline_full_mock(tmp_path: Path) -> None:
@@ -71,7 +71,7 @@ def test_run_basic_flow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     src = tmp_path / "src"
     src.mkdir()
     (src / "app.py").write_text("x")
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", False):
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
         with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
@@ -97,10 +97,10 @@ def test_run_basic_flow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
 
 def test_run_interactive_cancel_name() -> None:
     pytest.importorskip("questionary")
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", True):
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", True):
         t = MagicMock()
         t.ask.return_value = None
-        with patch("fast_cli.project_generation.questionary.text", return_value=t):
+        with patch("fastx_cli.project_generation.questionary.text", return_value=t):
             ProjectGenerationOrchestrator().run_interactive()
 
 
@@ -143,7 +143,7 @@ def test_run_basic_oserror_pass(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     src = tmp_path / "src"
     src.mkdir()
     (src / "d").mkdir()
-    with patch("fast_cli.project_generation.HAS_QUESTIONARY", False):
+    with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
         with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
@@ -151,7 +151,7 @@ def test_run_basic_oserror_pass(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
                 return_value=["d"],
             ):
                 with patch(
-                    "fast_cli.project_generation.shutil.copytree",
+                    "fastx_cli.project_generation.shutil.copytree",
                     side_effect=OSError,
                 ):
                     with patch.object(

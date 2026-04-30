@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-from fast_cli.app import cli
-from fast_cli.user_config import load_user_defaults
+from fastx_cli.app import cli
+from fastx_cli.user_config import load_user_defaults
 
 
 def test_load_user_defaults_missing() -> None:
@@ -16,7 +16,7 @@ def test_load_user_defaults_missing() -> None:
 
 
 def test_load_user_defaults_from_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("fast_cli.user_config.config_dir", lambda: tmp_path / "fastmvc")
+    monkeypatch.setattr("fastx_cli.user_config.config_dir", lambda: tmp_path / "fastmvc")
     p = tmp_path / "fastmvc" / "defaults.toml"
     p.parent.mkdir(parents=True)
     p.write_text(
@@ -40,14 +40,14 @@ def test_check_env_alias() -> None:
 
 
 def test_completion_requires_fast_on_path() -> None:
-    with patch("fast_cli.commands.completion_cmd.shutil.which", return_value=None):
+    with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value=None):
         r = CliRunner().invoke(cli, ["completion", "bash"])
         assert r.exit_code == 1
 
 
 def test_completion_success_mocked() -> None:
-    with patch("fast_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
-        with patch("fast_cli.commands.completion_cmd.subprocess.run") as run:
+    with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
+        with patch("fastx_cli.commands.completion_cmd.subprocess.run") as run:
             run.return_value = MagicMock(
                 returncode=0,
                 stdout="# completion script\n",
@@ -75,7 +75,7 @@ def test_user_config_xdg_config_home(
 ) -> None:
     cfg_home = tmp_path / "xdg"
     monkeypatch.setenv("XDG_CONFIG_HOME", str(cfg_home))
-    from fast_cli import user_config as uc
+    from fastx_cli import user_config as uc
 
     assert uc.config_dir() == cfg_home / "fastmvc"
     p = cfg_home / "fastmvc" / "defaults.toml"
@@ -88,7 +88,7 @@ def test_user_config_bad_toml(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
-        "fast_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
+        "fastx_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
     )
     p = tmp_path / "fastmvc" / "defaults.toml"
     p.parent.mkdir(parents=True)
@@ -100,7 +100,7 @@ def test_user_config_read_oserror(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
-        "fast_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
+        "fastx_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
     )
     p = tmp_path / "fastmvc" / "defaults.toml"
     p.parent.mkdir(parents=True)
@@ -117,7 +117,7 @@ def test_user_config_non_dict_root(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
-        "fast_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
+        "fastx_cli.user_config.config_dir", lambda: tmp_path / "fastmvc"
     )
     p = tmp_path / "fastmvc" / "defaults.toml"
     p.parent.mkdir(parents=True)
@@ -130,12 +130,12 @@ def test_user_config_defaults_not_dict(
 ) -> None:
     p = tmp_path / "defaults.toml"
     p.write_text("x=1\n", encoding="utf-8")
-    monkeypatch.setattr("fast_cli.user_config.defaults_path", lambda: p)
+    monkeypatch.setattr("fastx_cli.user_config.defaults_path", lambda: p)
 
     def _loads(_s: str) -> dict:
         return {"defaults": "not-a-table"}
 
-    monkeypatch.setattr("fast_cli.user_config.tomllib.loads", _loads)
+    monkeypatch.setattr("fastx_cli.user_config.tomllib.loads", _loads)
     assert load_user_defaults() == {}
 
 
@@ -144,17 +144,17 @@ def test_user_config_loads_returns_non_dict_root(
 ) -> None:
     p = tmp_path / "defaults.toml"
     p.write_text("ignored\n", encoding="utf-8")
-    monkeypatch.setattr("fast_cli.user_config.defaults_path", lambda: p)
-    monkeypatch.setattr("fast_cli.user_config.tomllib.loads", lambda _s: [])
+    monkeypatch.setattr("fastx_cli.user_config.defaults_path", lambda: p)
+    monkeypatch.setattr("fastx_cli.user_config.tomllib.loads", lambda _s: [])
     assert load_user_defaults() == {}
 
 
 def test_completion_subprocess_timeout() -> None:
     import subprocess as sp
 
-    with patch("fast_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
+    with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
         with patch(
-            "fast_cli.commands.completion_cmd.subprocess.run",
+            "fastx_cli.commands.completion_cmd.subprocess.run",
             side_effect=sp.TimeoutExpired("x", 1),
         ):
             r = CliRunner().invoke(cli, ["completion", "zsh"])
@@ -162,16 +162,16 @@ def test_completion_subprocess_timeout() -> None:
 
 
 def test_completion_subprocess_failed() -> None:
-    with patch("fast_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
-        with patch("fast_cli.commands.completion_cmd.subprocess.run") as run:
+    with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
+        with patch("fastx_cli.commands.completion_cmd.subprocess.run") as run:
             run.return_value = MagicMock(returncode=1, stdout="", stderr="bad")
             r = CliRunner().invoke(cli, ["completion", "fish"])
     assert r.exit_code == 1
 
 
 def test_completion_empty_script() -> None:
-    with patch("fast_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
-        with patch("fast_cli.commands.completion_cmd.subprocess.run") as run:
+    with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value="/x/fast"):
+        with patch("fastx_cli.commands.completion_cmd.subprocess.run") as run:
             run.return_value = MagicMock(returncode=0, stdout="   \n", stderr="")
             r = CliRunner().invoke(cli, ["completion", "bash"])
     assert r.exit_code == 1
@@ -196,7 +196,7 @@ def test_doctor_git_missing_from_path(monkeypatch: pytest.MonkeyPatch) -> None:
             return None
         return real_which(cmd)
 
-    monkeypatch.setattr("fast_cli.commands.doctor_cmd.shutil.which", _which)
+    monkeypatch.setattr("fastx_cli.commands.doctor_cmd.shutil.which", _which)
     r = CliRunner().invoke(cli, ["doctor"])
     assert r.exit_code == 0
     assert "missing" in r.output.lower() or "git" in r.output.lower()
@@ -204,7 +204,7 @@ def test_doctor_git_missing_from_path(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_doctor_tool_hints() -> None:
-    from fast_cli.commands import doctor_cmd as dc
+    from fastx_cli.commands import doctor_cmd as dc
 
     git_hint = dc._tool_install_hint("git")
     assert "git" in git_hint.lower() or "install" in git_hint.lower()
@@ -225,29 +225,29 @@ def test_doctor_tool_hints() -> None:
 def test_doctor_git_hint_by_platform(
     plat: str, needle: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from fast_cli.commands import doctor_cmd as dc
+    from fastx_cli.commands import doctor_cmd as dc
 
-    monkeypatch.setattr("fast_cli.commands.doctor_cmd.sys.platform", plat)
+    monkeypatch.setattr("fastx_cli.commands.doctor_cmd.sys.platform", plat)
     assert needle in dc._tool_install_hint("git")
 
 
 def test_doctor_unknown_tool_hint() -> None:
-    from fast_cli.commands import doctor_cmd as dc
+    from fastx_cli.commands import doctor_cmd as dc
 
     assert "package manager" in dc._tool_install_hint("unknown").lower()
 
 
 def test_doctor_ready_panel_all_green(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "fast_cli.commands.doctor_cmd.shutil.which",
+        "fastx_cli.commands.doctor_cmd.shutil.which",
         lambda _exe: "/mock/bin/tool",
     )
     monkeypatch.setattr(
-        "fast_cli.commands.doctor_cmd.importlib.util.find_spec",
+        "fastx_cli.commands.doctor_cmd.importlib.util.find_spec",
         lambda _mod: object(),
     )
     monkeypatch.setattr(
-        "fast_cli.commands.doctor_cmd.metadata.version",
+        "fastx_cli.commands.doctor_cmd.metadata.version",
         lambda _n: "9.9.9",
     )
 
@@ -261,11 +261,11 @@ def test_quickstart_applies_cfg_venv_name(
 ) -> None:
     from unittest.mock import patch
 
-    from fast_cli.project_generation import ProjectGenerationOrchestrator
+    from fastx_cli.project_generation import ProjectGenerationOrchestrator
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
-        "fast_cli.project_generation.load_user_defaults",
+        "fastx_cli.project_generation.load_user_defaults",
         lambda: {"venv_name": "  .extra  "},
     )
     orch = ProjectGenerationOrchestrator()
@@ -279,7 +279,7 @@ def test_generate_merges_user_config(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
-        "fast_cli.commands.generate_cmd.load_user_defaults",
+        "fastx_cli.commands.generate_cmd.load_user_defaults",
         lambda: {
             "author": "FromCfg",
             "author_email": "cfg@e.co",
@@ -288,7 +288,7 @@ def test_generate_merges_user_config(
         },
     )
     with patch(
-        "fast_cli.project_generation.ProjectGenerationOrchestrator._execute_pipeline"
+        "fastx_cli.project_generation.ProjectGenerationOrchestrator._execute_pipeline"
     ):
         r = CliRunner().invoke(
             cli,

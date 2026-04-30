@@ -21,7 +21,7 @@ def _imp(name, globals=None, locals=None, fromlist=(), level=0):
     return _real(name, globals, locals, fromlist, level)
 builtins.__import__ = _imp
 from click.testing import CliRunner
-from fast_cli.app import cli
+from fastx_cli.app import cli
 r = CliRunner().invoke(cli, ["cache", "clear"])
 assert r.exit_code == 0
 """

@@ -1,4 +1,4 @@
-"""Tests for :mod:`fast_cli.commands.commit_history_setup`."""
+"""Tests for :mod:`fastx_cli.commands.commit_history_setup`."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 from click.testing import CliRunner
-from fast_cli.app import cli
-from fast_cli.commands import commit_history_setup as chs
+from fastx_cli.app import cli
+from fastx_cli.commands import commit_history_setup as chs
 
 
 def test_repos_list_normalizes_non_list() -> None:
@@ -88,7 +88,7 @@ def test_write_pre_commit_bad_yaml(tmp_path: Path) -> None:
 
 
 def test_install_pre_commit_hooks_success(tmp_path: Path) -> None:
-    with patch("fast_cli.commands.commit_history_setup.subprocess.run") as run:
+    with patch("fastx_cli.commands.commit_history_setup.subprocess.run") as run:
         run.return_value = MagicMock(returncode=0)
         ok, err = chs._install_pre_commit_hooks(tmp_path)
         assert ok and err is None
@@ -96,7 +96,7 @@ def test_install_pre_commit_hooks_success(tmp_path: Path) -> None:
 
 
 def test_install_pre_commit_hooks_missing_binary(tmp_path: Path) -> None:
-    with patch("fast_cli.commands.commit_history_setup.subprocess.run") as run:
+    with patch("fastx_cli.commands.commit_history_setup.subprocess.run") as run:
         run.side_effect = FileNotFoundError()
         ok, err = chs._install_pre_commit_hooks(tmp_path)
         assert not ok
@@ -173,7 +173,7 @@ def test_setup_commit_log_chmod_oserror(git_repo: Path) -> None:
 
 def test_setup_commit_log_install_hooks_fail(git_repo: Path) -> None:
     with patch(
-        "fast_cli.commands.commit_history_setup._install_pre_commit_hooks",
+        "fastx_cli.commands.commit_history_setup._install_pre_commit_hooks",
         return_value=(False, "no pre-commit"),
     ):
         r = CliRunner().invoke(

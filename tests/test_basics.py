@@ -5,18 +5,18 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-import fast_cli
+import fastx_cli
 from click.testing import CliRunner
-from fast_cli import __version__
-from fast_cli.app import cli, main
-from fast_cli.cli import cli as cli_shim
-from fast_cli.commands.project_root import resolve_fastmvc_project_root
-from fast_cli.output import output
+from fastx_cli import __version__
+from fastx_cli.app import cli, main
+from fastx_cli.cli import cli as cli_shim
+from fastx_cli.commands.project_root import resolve_fastmvc_project_root
+from fastx_cli.output import output
 
 
 def test_version_matches_init() -> None:
     assert isinstance(__version__, str)
-    assert fast_cli.__version__ == __version__
+    assert fastx_cli.__version__ == __version__
 
 
 def test_resolve_fastmvc_project_root_with_pyproject(tmp_path: Path) -> None:
@@ -43,7 +43,7 @@ def test_cli_shim_same_as_app() -> None:
 
 
 def test_main_invokes_cli() -> None:
-    with patch("fast_cli.app.cli") as mock_cli:
+    with patch("fastx_cli.app.cli") as mock_cli:
         main()
         mock_cli.assert_called_once()
 
@@ -51,8 +51,8 @@ def test_main_invokes_cli() -> None:
 def test_fast_cli_main_block() -> None:
     import runpy
 
-    with patch("fast_cli.app.main") as mock_main:
-        runpy.run_module("fast_cli.__main__", run_name="__main__")
+    with patch("fastx_cli.app.main") as mock_main:
+        runpy.run_module("fastx_cli.__main__", run_name="__main__")
         mock_main.assert_called_once()
 
 

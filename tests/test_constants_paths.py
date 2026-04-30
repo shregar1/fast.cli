@@ -1,12 +1,12 @@
-"""Tests for :mod:`fast_cli.constants` and :mod:`fast_cli.paths`."""
+"""Tests for :mod:`fastx_cli.constants` and :mod:`fastx_cli.paths`."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
-from fast_cli.constants import ARTIFACTS_BY_LANGUAGE, DEFAULT_TEMPLATE_ITEMS
-from fast_cli.paths import FrameworkSourceLocator
+from fastx_cli.constants import ARTIFACTS_BY_LANGUAGE, DEFAULT_TEMPLATE_ITEMS
+from fastx_cli.paths import FrameworkSourceLocator
 
 
 def test_default_template_items_nonempty() -> None:
@@ -21,12 +21,12 @@ def test_artifacts_by_language_keys() -> None:
 
 
 def test_framework_locator_repo_root(tmp_path: Path) -> None:
-    loc = FrameworkSourceLocator(package_dir=tmp_path / "fast_cli")
+    loc = FrameworkSourceLocator(package_dir=tmp_path / "fastx_cli")
     assert loc.repo_root == tmp_path
 
 
 def test_fast_mvc_root_prefers_repo_child(tmp_path: Path) -> None:
-    pkg = tmp_path / "fast_cli"
+    pkg = tmp_path / "fastx_cli"
     pkg.mkdir()
     mvc = tmp_path / "fast_mvc"
     mvc.mkdir()
@@ -35,7 +35,7 @@ def test_fast_mvc_root_prefers_repo_child(tmp_path: Path) -> None:
 
 
 def test_fast_mvc_root_fallback_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    pkg = tmp_path / "pkg" / "fast_cli"
+    pkg = tmp_path / "pkg" / "fastx_cli"
     pkg.mkdir(parents=True)
     mvc = tmp_path / "fast_mvc"
     mvc.mkdir()
@@ -45,7 +45,7 @@ def test_fast_mvc_root_fallback_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPa
 
 
 def test_list_existing_template_items(tmp_path: Path) -> None:
-    pkg = tmp_path / "fast_cli"
+    pkg = tmp_path / "fastx_cli"
     pkg.mkdir()
     mvc = tmp_path / "fast_mvc"
     mvc.mkdir()
