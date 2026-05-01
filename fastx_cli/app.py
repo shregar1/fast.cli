@@ -45,6 +45,10 @@ from fastx_cli.commands.sdk_cmd import sdk_group
 from fastx_cli.commands.tasks_cmd import tasks_group
 from fastx_cli.commands.test_cmd import register_test_command
 from fastx_cli.commands.upgrade_cmd import register_upgrade_command
+from fastx_cli.commands.migrate_cmd import register_migrate
+from fastx_cli.commands.bench_cmd import register_bench
+from fastx_cli.commands.audit_cmd import register_audit
+from fastx_cli.commands.mock_cmd import register_mock
 
 
 @click.group(
@@ -130,6 +134,10 @@ cli.add_command(cache_group)
 cli.add_command(sdk_group, name="sdk")
 cli.add_command(tasks_group)
 cli.add_command(deploy_group, name="deploy")
+register_migrate(cli)
+register_bench(cli)
+register_audit(cli)
+register_mock(cli)
 
 
 def main() -> None:
