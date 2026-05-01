@@ -235,5 +235,5 @@ app.include_router(item_router)
 # DELETE /items/{id}     - Delete item"""
         output.console.print(Syntax(code, "python", theme="monokai", line_numbers=True))
         output.console.print(
-            "\n[italic dim #94a3b8]Happy coding with FastMVC · ship something great[/italic dim #94a3b8]\n"
+            "\n[italic dim #94a3b8]Happy coding with FastX · ship something great[/italic dim #94a3b8]\n"
         )

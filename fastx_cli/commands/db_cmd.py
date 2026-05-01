@@ -2,7 +2,7 @@
 
 These subcommands are thin **wrappers** around the ``alembic`` CLI installed in
 the user’s environment. They assume the user has ``cd``’d into a project with
-``alembic.ini`` at the current working directory (typical FastMVC layout).
+``alembic.ini`` at the current working directory (typical FastX layout).
 
 :class:`AlembicProjectGuard` centralizes preflight checks so each command stays
 focused on subprocess orchestration and Rich output.
@@ -56,7 +56,7 @@ class AlembicProjectGuard:
         """Ensure ``alembic.ini`` exists in the process CWD; abort if missing."""
         if not Path("alembic.ini").exists():
             output.print_error(
-                "alembic.ini not found. Are you in a FastMVC project directory?"
+                "alembic.ini not found. Are you in a FastX project directory?"
             )
             raise click.Abort()
 

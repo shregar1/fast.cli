@@ -4,7 +4,7 @@
 operations) and emits a full set of files: SQLAlchemy models, repositories,
 services, FastAPI routers, request/response DTOs, and test stubs.
 
-The generated layout follows the standard FastMVC directory conventions so files
+The generated layout follows the standard FastX directory conventions so files
 can be dropped straight into an existing project.
 """
 

@@ -64,7 +64,7 @@ def _require_alembic_ini() -> None:
     if not Path("alembic.ini").exists():
         output.print_error(
             "alembic.ini not found in the current directory. "
-            "Are you in a FastMVC project root?"
+            "Are you in a FastX project root?"
         )
         raise click.Abort()
 

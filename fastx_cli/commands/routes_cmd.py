@@ -42,7 +42,7 @@ def register_routes_command(cli: click.Group) -> None:
         except ImportError as exc:
             output.print_error(
                 f"Could not import FastAPI app: {exc}\n"
-                "  Make sure you are in a FastMVC project root with an app.py "
+                "  Make sure you are in a FastX project root with an app.py "
                 "that exposes an `app` instance."
             )
             raise SystemExit(1) from None

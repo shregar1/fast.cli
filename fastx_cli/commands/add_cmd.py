@@ -3,7 +3,7 @@
 The ``add resource`` command creates a **vertical slice** for one operation under
 a versioned API: request/response DTOs, repository, service, dependency
 provider, core controller, and FastAPI-facing API controller. File contents are
-string templates (not Jinja) aligned with FastMVC conventions.
+string templates (not Jinja) aligned with FastX conventions.
 
 Requires a project layout where ``abstractions/controller.py`` exists under
 :func:`fastx_cli.commands.project_root.resolve_fastmvc_project_root`.
@@ -26,7 +26,7 @@ if HAS_QUESTIONARY:
 
 @click.group(name="add")
 def add_group() -> None:
-    """➕ Add new components to your FastMVC project.
+    """➕ Add new components to your FastX project.
 
     Quickly scaffold new resources, services, or controllers with
     context-aware templates that follow framework standards.
@@ -270,7 +270,7 @@ def add_resource(folder: str, resource: str, version: str, crud: bool) -> None:
     target_path = resolve_fastmvc_project_root()
     if not (target_path / FRAMEWORK_CONTROLLER_PATH).exists():
         output.print_error(
-            f"Not in a FastMVC project (could not find abstractions/controller.py in {target_path})"
+            f"Not in a FastX project (could not find abstractions/controller.py in {target_path})"
         )
         raise click.Abort()
 
@@ -279,26 +279,26 @@ def add_resource(folder: str, resource: str, version: str, crud: bool) -> None:
 
 @add_group.command(name="middleware")
 def add_middleware() -> None:
-    """Middleware scaffolding (templates not bundled in fastmvc-cli)."""
+    """Middleware scaffolding (templates not bundled in fastx-cli)."""
     output.print_banner()
     output.print_warning(
         "Middleware scaffolding is not bundled in this package."
     )
     output.print_info(
-        "Use the FastMVC (fast_mvc) framework repo as reference, or extend "
+        "Use the FastX (fast_mvc) framework repo as reference, or extend "
         "``middlewares/`` manually."
     )
 
 
 @add_group.command(name="auth")
 def add_auth() -> None:
-    """JWT / auth stack scaffolding (templates not bundled in fastmvc-cli)."""
+    """JWT / auth stack scaffolding (templates not bundled in fastx-cli)."""
     output.print_banner()
     output.print_warning(
         "A full auth stack is not bundled in this package."
     )
     output.print_info(
-        "Copy patterns from the FastMVC application template or implement auth "
+        "Copy patterns from the FastX application template or implement auth "
         "in your ``services/`` and ``apis/`` layers."
     )
 
@@ -311,5 +311,5 @@ def add_test() -> None:
         "Resource test scaffolding is not bundled in this package."
     )
     output.print_info(
-        "Add tests under ``tests/`` following your FastMVC project conventions."
+        "Add tests under ``tests/`` following your FastX project conventions."
     )

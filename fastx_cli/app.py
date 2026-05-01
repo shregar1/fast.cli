@@ -61,7 +61,7 @@ from fastx_cli.commands.scaffold_cmd import register_scaffold
 )
 @click.version_option(version=__version__, prog_name="fast")
 def cli() -> None:
-    r"""✨ FastMVC CLI — FastAPI project generator and tooling.
+    r"""✨ FastX CLI — FastAPI project generator and tooling.
 
     \b
     Projects:

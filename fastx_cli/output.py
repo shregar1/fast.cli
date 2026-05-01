@@ -103,23 +103,23 @@ class CliOutput:
             else BANNER_SUBTITLE.replace(" / ", " · ")
         )
         self.console.print()
-        self.console.print(Align.center(Text("FastMVC CLI", style="bold")))
+        self.console.print(Align.center(Text("FastX CLI", style="bold")))
         self.console.print(Align.center(Text(sub, style="dim")))
         self.console.print()
 
     def print_banner(self) -> None:
-        """Render the FastMVC wordmark with a soft cyan→violet gradient."""
+        """Render the FastX wordmark with a soft cyan→violet gradient."""
         if _use_compact_banner(self.console):
             self._print_banner_compact()
             return
 
         raw_lines = [
-            r"  ███████╗ █████╗ ███████╗████████╗ ███╗   ███╗██╗   ██╗ ██████╗",
-            r"  ██╔════╝██╔══██╗██╔════╝╚══██╔══╝ ████╗ ████║██║   ██║██╔════╝",
-            r"  █████╗  ███████║███████╗   ██║    ██╔████╔██║██║   ██║██║     ",
-            r"  ██╔══╝  ██╔══██║╚════██║   ██║    ██║╚██╔╝██║╚██╗ ██╔╝██║     ",
-            r"  ██║     ██║  ██║███████║   ██║    ██║ ╚═╝ ██║ ╚████╔╝ ╚██████╗",
-            r"  ╚═╝     ╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═╝     ╚═╝  ╚═══╝   ╚═════╝",
+            r"  ███████╗ █████╗ ███████╗████████╗██╗  ██╗",
+            r"  ██╔════╝██╔══██╗██╔════╝╚══██╔══╝╚██╗██╔╝",
+            r"  █████╗  ███████║███████╗   ██║    ╚███╔╝ ",
+            r"  ██╔══╝  ██╔══██║╚════██║   ██║    ██╔██╗ ",
+            r"  ██║     ██║  ██║███████║   ██║   ██╔╝ ██╗",
+            r"  ╚═╝     ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝",
         ]
         n = max(len(raw_lines) - 1, 1)
         body = Text()
@@ -131,7 +131,7 @@ class CliOutput:
 
         panel = Panel(
             Align.center(body),
-            title=f"[bold {_C_TITLE}]⚡ FastMVC[/bold {_C_TITLE}]",
+            title=f"[bold {_C_TITLE}]⚡ FastX[/bold {_C_TITLE}]",
             subtitle="[italic dim]FastAPI · MVC · Production-ready[/italic dim]",
             border_style=_C_BORDER,
             box=box.ROUNDED,

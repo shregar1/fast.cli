@@ -43,7 +43,7 @@ def _tool_install_hint(tool_label: str) -> str:
 
 def _optional_install_hint(dist_name: str) -> str:
     if dist_name == "questionary":
-        return "pip install 'fastmvc-cli[interactive]'"
+        return "pip install 'fastx-cli[interactive]'"
     return f"pip install {dist_name}"
 
 
@@ -117,7 +117,7 @@ def register_doctor_commands(cli: click.Group) -> None:
         output.console.print(opt_table)
 
         output.print_info(
-            "Install optional stacks as needed (see fastmvc-cli extras on PyPI)."
+            "Install optional stacks as needed (see fastx-cli extras on PyPI)."
         )
 
         _print_suggested_fixes(missing_tools, missing_optional)

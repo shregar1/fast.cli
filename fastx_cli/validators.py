@@ -1,6 +1,6 @@
 """Questionary validators for interactive prompts.
 
-When ``questionary`` is installed (recommended extra: ``fastmvc-cli[interactive]``),
+When ``questionary`` is installed (recommended extra: ``fastx-cli[interactive]``),
 these classes subclass :class:`questionary.Validator` and enforce input rules
 for project names, paths, and emails.
 

@@ -48,7 +48,7 @@ def register_completion_command(cli: click.Group) -> None:
             output.print_error(
                 "Could not find 'fast', 'fast-cli', or 'fastmvc' on PATH."
             )
-            output.print_info("Install with: pip install fastmvc-cli")
+            output.print_info("Install with: pip install fastx-cli")
             raise SystemExit(1)
 
         argv = [exe]
@@ -76,7 +76,7 @@ def register_completion_command(cli: click.Group) -> None:
         if not script:
             output.print_warning("No completion script was produced.")
             output.print_info(
-                "Install the ``fast`` script on PATH (``pip install fastmvc-cli``) "
+                "Install the ``fast`` script on PATH (``pip install fastx-cli``) "
                 "and use Click 8+."
             )
             raise SystemExit(1)

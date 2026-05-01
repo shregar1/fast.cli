@@ -36,7 +36,7 @@ class MkdocsStyleReferenceGenerator:
     """
 
     def __init__(self, target_path: Path) -> None:
-        """``target_path`` is the resolved FastMVC project root (see ``resolve_*``)."""
+        """``target_path`` is the resolved FastX project root (see ``resolve_*``)."""
         self._root = target_path
 
     def run(self) -> None:
@@ -127,7 +127,7 @@ class MkdocsStyleReferenceGenerator:
         ecosystem_doc_path = self._root / "docs" / "api" / "ecosystem.md"
         ecosystem_content = (
             "# 🌐 Ecosystem API Reference\n\n"
-            "Automated reference for all packages in the FastMVC ecosystem.\n\n"
+            "Automated reference for all packages in the FastX ecosystem.\n\n"
         )
         parent_dir = self._root.parent
         ecosystem_packages = sorted(

@@ -55,7 +55,7 @@ def register_generate_commands(cli: click.Group) -> None:
         venv_name: str,
         install_deps: bool,
     ) -> None:
-        """🚀 Generate a new FastMVC project interactively or with options."""
+        """🚀 Generate a new FastX project interactively or with options."""
         if not all([name, path]):
             orchestrator.run_interactive()
             return
@@ -109,7 +109,7 @@ def register_generate_commands(cli: click.Group) -> None:
         venv_name: str,
         install_deps: bool,
     ) -> None:
-        """🆕 Alias for ``generate`` — create a new FastMVC project."""
+        """🆕 Alias for ``generate`` — create a new FastX project."""
         ctx.invoke(
             generate,
             name=name,

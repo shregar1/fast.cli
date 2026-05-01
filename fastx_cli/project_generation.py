@@ -109,7 +109,7 @@ class ProjectGenerationOrchestrator:
             output.console.print(
                 Panel(
                     "[yellow]For the best experience, install with:[/yellow]\n"
-                    "[bold]pip install fastmvc-cli[interactive][/bold]",
+                    "[bold]pip install fastx-cli[interactive][/bold]",
                     title="💡 Tip",
                     border_style="yellow",
                 )
@@ -177,7 +177,7 @@ class ProjectGenerationOrchestrator:
         _desc_default: str = (
             _desc_raw
             if isinstance(_desc_raw, str)
-            else f"{project_name} - FastAPI backend built with FastMVC"
+            else f"{project_name} - FastAPI backend built with FastX"
         )
         description = questionary.text(
             "📝 Project description:",
@@ -421,7 +421,7 @@ class ProjectGenerationOrchestrator:
         _desc = (
             cfg.get("description")
             if isinstance(cfg.get("description"), str)
-            else "FastAPI project built with FastMVC"
+            else "FastAPI project built with FastX"
         )
         target_path = Path.cwd() / name
         context = {
