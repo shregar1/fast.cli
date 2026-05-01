@@ -49,6 +49,8 @@ from fastx_cli.commands.migrate_cmd import register_migrate
 from fastx_cli.commands.bench_cmd import register_bench
 from fastx_cli.commands.audit_cmd import register_audit
 from fastx_cli.commands.mock_cmd import register_mock
+from fastx_cli.commands.changelog_cmd import register_changelog
+from fastx_cli.commands.scaffold_cmd import register_scaffold
 
 
 @click.group(
@@ -138,6 +140,8 @@ register_migrate(cli)
 register_bench(cli)
 register_audit(cli)
 register_mock(cli)
+register_changelog(cli)
+register_scaffold(cli)
 
 
 def main() -> None:
