@@ -33,12 +33,18 @@ from fastx_cli.commands.db_cmd import db_group
 from fastx_cli.commands.decimate_cmd import register_decimate_command
 from fastx_cli.commands.deploy_cmd import deploy_group
 from fastx_cli.commands.dev_cmd import register_dev_command
+from fastx_cli.commands.env_cmd import register_env_check_command
+from fastx_cli.commands.lint_cmd import register_lint_command
+from fastx_cli.commands.logs_cmd import register_logs_command
 from fastx_cli.commands.docs_cmd import docs_group
 from fastx_cli.commands.doctor_cmd import register_doctor_commands
 from fastx_cli.commands.generate_cmd import register_generate_commands
 from fastx_cli.commands.misc_cmd import register_misc_commands
+from fastx_cli.commands.routes_cmd import register_routes_command
 from fastx_cli.commands.sdk_cmd import sdk_group
 from fastx_cli.commands.tasks_cmd import tasks_group
+from fastx_cli.commands.test_cmd import register_test_command
+from fastx_cli.commands.upgrade_cmd import register_upgrade_command
 
 
 @click.group(
@@ -108,9 +114,15 @@ register_misc_commands(cli)
 register_commit_history_setup(cli)
 register_decimate_command(cli)
 register_dev_command(cli)
+register_env_check_command(cli)
+register_lint_command(cli)
+register_logs_command(cli)
 register_doctor_commands(cli)
 register_checkpoint_command(cli)
 register_completion_command(cli)
+register_routes_command(cli)
+register_test_command(cli)
+register_upgrade_command(cli)
 cli.add_command(docs_group)
 cli.add_command(db_group, name="db")
 cli.add_command(add_group, name="add")

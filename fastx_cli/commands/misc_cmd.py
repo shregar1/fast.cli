@@ -28,23 +28,18 @@ def register_misc_commands(cli: click.Group) -> None:
     @click.argument("type", type=click.Choice(["resource", "env"], case_sensitive=False))
     @click.option("--name", "-n", help="Name of the resource")
     def make(type: str, name: str) -> None:
-        """[DEPRECATED] Use 'fast add' instead."""
+        """[DEPRECATED] Use 'fast add' or 'fast env' instead."""
         ctx = click.get_current_context()
         if type.lower() == "resource":
             ctx.invoke(add_resource, folder=name, resource="fetch", version="v1")
         elif type.lower() == "env":
-            ctx.invoke(generate_env)
-
-    @cli.command(name="env")
-    @click.pass_context
-    def generate_env(ctx: click.Context) -> None:
-        """🛠️ Generate .env from .env.example template."""
-        output.print_banner()
-        target_path = resolve_fastmvc_project_root(Path.cwd())
-        context = ctx.parent.params if ctx.parent else {}
-        if bootstrap.generate_env_file(target_path, context):
-            output.print_success("Environment file generated successfully!")
-        else:
-            output.print_error(
-                f"Failed to generate {ENV_FILENAME} (ensure {ENV_EXAMPLE_FILENAME} exists and {ENV_FILENAME} does not)."
-            )
+            output.print_warning("Use 'fast env sync' or 'fast env generate' instead.")
+            output.print_banner()
+            target_path = resolve_fastmvc_project_root(Path.cwd())
+            context = ctx.parent.params if ctx.parent else {}
+            if bootstrap.generate_env_file(target_path, context):
+                output.print_success("Environment file generated successfully!")
+            else:
+                output.print_error(
+                    f"Failed to generate {ENV_FILENAME} (ensure {ENV_EXAMPLE_FILENAME} exists and {ENV_FILENAME} does not)."
+                )

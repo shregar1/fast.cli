@@ -17,15 +17,18 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html — Alembic concepts.
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 import click
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
+from fastx_cli.commands.project_root import resolve_fastmvc_project_root
 from fastx_cli.constants import (
     TIMEOUT_ALEMBIC_MUTATION,
     TIMEOUT_ALEMBIC_QUERY,
@@ -489,3 +492,237 @@ def db_status() -> None:
     except Exception as e:
         output.print_error(f"Error checking status: {e}")
         raise click.Abort()
+
+
+# ---------------------------------------------------------------------------
+# Seed template
+# ---------------------------------------------------------------------------
+
+_SEED_TEMPLATE = '''\
+"""Database seed script.
+
+Run via:  fastx db seed
+          fastx db seed --count 50 --model User --reset
+
+Environment variables (set automatically by the CLI):
+    SEED_COUNT  — number of records to create per model (default 10)
+    SEED_MODEL  — restrict seeding to a single model name
+    SEED_RESET  — when set to "1", truncate target tables before seeding
+    DATABASE_URL — SQLAlchemy-compatible connection string
+"""
+
+from __future__ import annotations
+
+import os
+from datetime import datetime, timezone
+
+from faker import Faker
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session
+
+fake = Faker()
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./app.db")
+SEED_COUNT = int(os.environ.get("SEED_COUNT", "10"))
+SEED_MODEL = os.environ.get("SEED_MODEL", "")
+SEED_RESET = os.environ.get("SEED_RESET", "0") == "1"
+
+engine = create_engine(DATABASE_URL)
+
+
+def seed_users(session: Session, count: int) -> None:
+    """Create *count* fake user rows."""
+    if SEED_RESET:
+        session.execute(text("DELETE FROM users"))
+        session.commit()
+        print("  Truncated users table")
+
+    for _ in range(count):
+        session.execute(
+            text(
+                "INSERT INTO users (name, email, created_at) "
+                "VALUES (:name, :email, :created_at)"
+            ),
+            {
+                "name": fake.name(),
+                "email": fake.unique.email(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
+        )
+    session.commit()
+    print(f"  Seeded {count} users")
+
+
+# Map model names to seeder functions.
+# Add more entries as your project grows.
+SEEDERS: dict[str, callable] = {
+    "User": seed_users,
+}
+
+
+if __name__ == "__main__":
+    with Session(engine) as session:
+        if SEED_MODEL:
+            seeder = SEEDERS.get(SEED_MODEL)
+            if seeder is None:
+                print(f"Unknown model: {SEED_MODEL}")
+                print(f"Available models: {', '.join(SEEDERS)}")
+                raise SystemExit(1)
+            seeder(session, SEED_COUNT)
+        else:
+            for name, seeder in SEEDERS.items():
+                print(f"Seeding {name}...")
+                seeder(session, SEED_COUNT)
+
+    print("Done!")
+'''
+
+
+def _generate_seed_file(seeds_dir: Path) -> Path:
+    """Write the sample seed script and return its path."""
+    seeds_dir.mkdir(parents=True, exist_ok=True)
+    seed_file = seeds_dir / "seed.py"
+    seed_file.write_text(_SEED_TEMPLATE)
+    return seed_file
+
+
+@db_group.command(name="seed")
+@click.option(
+    "--count",
+    "-c",
+    default=10,
+    show_default=True,
+    help="Number of records to create per model.",
+)
+@click.option(
+    "--model",
+    "-m",
+    default=None,
+    help="Specific model name to seed (seeds all models if omitted).",
+)
+@click.option(
+    "--reset",
+    is_flag=True,
+    default=False,
+    help="Truncate target tables before seeding.",
+)
+@click.option(
+    "--generate",
+    is_flag=True,
+    default=False,
+    help="Force-generate the sample seed file even if seeds/ exists.",
+)
+def db_seed(
+    count: int,
+    model: Optional[str],
+    reset: bool,
+    generate: bool,
+) -> None:
+    """🌱 Seed the database with fake data.
+
+    Looks for a ``seeds/seed.py`` script in the project root and runs it.
+    If no seed script exists, a sample template is generated automatically.
+
+    Examples:\n
+        fastx db seed\n
+        fastx db seed --count 50 --model User\n
+        fastx db seed --reset\n
+        fastx db seed --generate
+    """
+    output.print_banner()
+    project_root = resolve_fastmvc_project_root()
+    seeds_dir = project_root / "seeds"
+    seed_file = seeds_dir / "seed.py"
+
+    # --generate: create/overwrite the template regardless
+    if generate:
+        path = _generate_seed_file(seeds_dir)
+        output.print_success(f"Generated seed template at {path}")
+        output.console.print(
+            Panel(
+                "[dim]Next steps:[/dim]\n"
+                "  1. Edit [cyan]seeds/seed.py[/cyan] to match your models\n"
+                "  2. Run [cyan]fastx db seed[/cyan] to populate data",
+                title="🌱 Seed Template",
+                border_style="green",
+            )
+        )
+        return
+
+    # If seeds/ directory doesn't exist, generate the template
+    if not seeds_dir.exists():
+        output.console.print(
+            "\n[bold yellow]No seeds/ directory found.[/bold yellow] "
+            "Generating sample seed template...\n"
+        )
+        path = _generate_seed_file(seeds_dir)
+        output.print_success(f"Generated seed template at {path}")
+        output.console.print(
+            Panel(
+                "[dim]Next steps:[/dim]\n"
+                "  1. Edit [cyan]seeds/seed.py[/cyan] to match your models\n"
+                "  2. Run [cyan]fastx db seed[/cyan] again to populate data",
+                title="🌱 Seed Template",
+                border_style="green",
+            )
+        )
+        return
+
+    # seeds/ exists but seed.py is missing
+    if not seed_file.exists():
+        output.print_error(
+            f"seeds/ directory exists but seeds/seed.py was not found.\n"
+            f"Run [cyan]fastx db seed --generate[/cyan] to create a template."
+        )
+        raise click.Abort()
+
+    # Run the seed script
+    output.console.print(
+        f"\n[bold cyan]Seeding database[/bold cyan]  "
+        f"count={count}"
+        f"{f'  model={model}' if model else ''}"
+        f"{'  reset=True' if reset else ''}\n"
+    )
+
+    env = os.environ.copy()
+    env["SEED_COUNT"] = str(count)
+    if model:
+        env["SEED_MODEL"] = model
+    if reset:
+        env["SEED_RESET"] = "1"
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold blue]{task.description}"),
+        console=output.console,
+    ) as progress:
+        task = progress.add_task("[cyan]Running seed script...", total=None)
+        try:
+            result = subprocess.run(
+                [sys.executable, str(seed_file)],
+                capture_output=True,
+                text=True,
+                timeout=TIMEOUT_SEED_SCRIPT,
+                env=env,
+                cwd=str(project_root),
+            )
+            progress.update(task, completed=True)
+
+            if result.stdout:
+                output.console.print(f"\n[dim]{result.stdout.strip()}[/dim]")
+
+            if result.returncode != 0:
+                output.print_error(f"Seed script failed:\n{result.stderr}")
+                raise click.Abort()
+
+            output.print_success("Database seeded successfully!")
+        except subprocess.TimeoutExpired:
+            progress.update(task, completed=True)
+            output.print_error("Seed script timed out")
+            raise click.Abort()
+        except click.Abort:
+            raise
+        except Exception as e:
+            progress.update(task, completed=True)
+            output.print_error(f"Error running seed script: {e}")
+            raise click.Abort()
