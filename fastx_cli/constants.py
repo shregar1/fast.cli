@@ -53,6 +53,8 @@ DEFAULT_TEMPLATE_ITEMS: list[str] = [
     ".vscode",
     "Makefile",
     ".pre-commit-config.yaml",
+    "docker-entrypoint.sh",
+    "postman",
 ]
 
 ARTIFACTS_BY_LANGUAGE: dict[str, dict[str, list[str]]] = {

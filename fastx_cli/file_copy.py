@@ -106,6 +106,9 @@ class ProjectCopier:
                             target_item_path,
                             ignore=template_copytree_ignore(source_path),
                         )
+                        for child in target_item_path.rglob("*"):
+                            if child.is_file():
+                                self._renderer.process_file(child, context)
                     else:
                         shutil.copy2(source_path, target_item_path)
                         self._renderer.process_file(target_item_path, context)
