@@ -46,6 +46,7 @@ DEFAULT_TEMPLATE_ITEMS: list[str] = [
     "requirements-dev.txt",
     "Dockerfile",
     "docker-compose.yml",
+    "docker-compose.local.yml",
     "alembic.ini",
     ".env.example",
     ".gitignore",

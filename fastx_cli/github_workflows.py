@@ -5,6 +5,12 @@ the monorepo checkout (parent of the ``fastx_cli`` package). They are **not**
 shipped inside the PyPI wheel; if the directory is missing, the copier warns and
 returns ``False``.
 
+Files copied include ``ci.yml``, ``pr-check.yml``, ``release.yml``, optional VM
+``deploy.yml``, and optional cloud workflows (``deploy-azure.yml``,
+``deploy-aws.yml``, ``deploy-fly.yml``, ``deploy-gcp-cloudrun.yml``,
+``deploy-railway.yml``, ``deploy-render.yml``) when present under
+``templates/github``.
+
 Each copied file is passed through :class:`fastx_cli.template_engine.TemplateRenderer`
 so ``{{PROJECT_NAME}}`` and similar markers can be expanded in CI YAML.
 """
@@ -19,7 +25,7 @@ from fastx_cli.template_engine import TemplateRenderer
 
 
 class GitHubWorkflowsCopier:
-    """Copy ``ci.yml``, ``pr-check.yml``, and ``release.yml`` into ``.github/workflows/``."""
+    """Copy CI, PR, release, and optional deploy workflows into ``.github/workflows/``."""
 
     def __init__(
         self,
@@ -51,7 +57,18 @@ class GitHubWorkflowsCopier:
         try:
             workflows_dir = target_path / ".github" / "workflows"
             workflows_dir.mkdir(parents=True, exist_ok=True)
-            workflow_files = ["ci.yml", "pr-check.yml", "release.yml"]
+            workflow_files = [
+                "ci.yml",
+                "pr-check.yml",
+                "release.yml",
+                "deploy.yml",
+                "deploy-aws.yml",
+                "deploy-azure.yml",
+                "deploy-fly.yml",
+                "deploy-gcp-cloudrun.yml",
+                "deploy-railway.yml",
+                "deploy-render.yml",
+            ]
             copied = 0
             for name in workflow_files:
                 src = templates_dir / name
