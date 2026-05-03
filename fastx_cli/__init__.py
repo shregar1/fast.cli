@@ -26,6 +26,6 @@ fastx_cli.app : Root Click group and ``main`` entry point.
 fastx_cli.project_generation : High-level new-project orchestration.
 """
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 __all__ = ["__version__"]
