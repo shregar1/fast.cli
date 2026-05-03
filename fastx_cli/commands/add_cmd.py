@@ -285,7 +285,7 @@ def add_middleware() -> None:
         "Middleware scaffolding is not bundled in this package."
     )
     output.print_info(
-        "Use the FastX (fast_mvc) framework repo as reference, or extend "
+        "Use the FastX (fastx_mvc) framework repo as reference, or extend "
         "``middlewares/`` manually."
     )
 

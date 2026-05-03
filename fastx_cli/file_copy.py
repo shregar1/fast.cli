@@ -69,7 +69,7 @@ class ProjectCopier:
         Parameters
         ----------
         source
-            Resolved :meth:`FrameworkSourceLocator.fast_mvc_root`.
+            Resolved :meth:`FrameworkSourceLocator.fastx_mvc_root`.
         target
             New project directory (created by caller if needed).
         items

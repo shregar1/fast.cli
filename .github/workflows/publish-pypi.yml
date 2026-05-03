@@ -9,7 +9,7 @@
 #
 # Local uploads can still use an API token with twine (see README).
 #
-# Release: bump __version__ in fast_cli/__init__.py, then:
+# Release: bump __version__ in fastx_cli/__init__.py, then:
 #   git tag v1.5.1 && git push origin v1.5.1
 
 name: Publish to PyPI
@@ -62,8 +62,8 @@ jobs:
           python -m venv .venv-smoke
           .venv-smoke/bin/pip install --upgrade pip
           .venv-smoke/bin/pip install dist/*.whl
-          .venv-smoke/bin/python -m fast_cli.app --help
-          .venv-smoke/bin/python -m fast_cli.app doctor
+          .venv-smoke/bin/python -m fastx_cli.app --help
+          .venv-smoke/bin/python -m fastx_cli.app doctor
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

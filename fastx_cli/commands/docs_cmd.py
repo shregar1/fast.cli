@@ -30,7 +30,7 @@ class MkdocsStyleReferenceGenerator:
 
     * ``docs/api/endpoints.md`` — sections per API version and resource.
     * ``docs/api/dtos.md`` — request/response DTO modules.
-    * ``docs/api/ecosystem.md`` — sibling ``fast_*`` packages next to the project.
+    * ``docs/api/ecosystem.md`` — sibling ``fastx_*`` packages next to the project.
 
     It does **not** invoke MkDocs; it only prepares content for a later build.
     """
@@ -123,7 +123,7 @@ class MkdocsStyleReferenceGenerator:
             )
 
     def _write_ecosystem(self) -> None:
-        """Emit ``ecosystem.md`` for sibling ``fast_*`` repos (optional)."""
+        """Emit ``ecosystem.md`` for sibling ``fastx_*`` repos (optional)."""
         ecosystem_doc_path = self._root / "docs" / "api" / "ecosystem.md"
         ecosystem_content = (
             "# 🌐 Ecosystem API Reference\n\n"
@@ -134,7 +134,9 @@ class MkdocsStyleReferenceGenerator:
             [
                 d.name
                 for d in parent_dir.iterdir()
-                if d.is_dir() and d.name.startswith("fast_") and d.name != "fast_mvc"
+                if d.is_dir()
+                and d.name.startswith("fastx_")
+                and d.name not in ("fastx_mvc", "fastx_mvc")
             ]
         )
         if not ecosystem_packages:

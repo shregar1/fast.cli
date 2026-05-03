@@ -149,7 +149,7 @@ def test_precommit_git_init_when_no_dotgit(tmp_path: Path) -> None:
 def test_cache_invalidate_new_loop() -> None:
     import types
 
-    inner = types.ModuleType("fast_caching.src.fast_caching")
+    inner = types.ModuleType("fastx_caching.src.fastx_caching")
 
     class Backend:
         async def clear(self) -> bool:
@@ -161,18 +161,18 @@ def test_cache_invalidate_new_loop() -> None:
         async def invalidate(self, tags: list) -> int:
             return 1
 
-    inner.fast_cache = FC()
+    inner.fastx_cache = FC()
     import sys
 
-    sys.modules["fast_caching"] = types.ModuleType("fast_caching")
-    sys.modules["fast_caching.src"] = types.ModuleType("fast_caching.src")
-    sys.modules["fast_caching.src.fast_caching"] = inner
+    sys.modules["fastx_caching"] = types.ModuleType("fastx_caching")
+    sys.modules["fastx_caching.src"] = types.ModuleType("fastx_caching.src")
+    sys.modules["fastx_caching.src.fastx_caching"] = inner
     try:
         with patch("asyncio.get_event_loop", side_effect=RuntimeError("no loop")):
             assert CliRunner().invoke(cli, ["cache", "invalidate", "x"]).exit_code == 0
     finally:
         for k in list(sys.modules):
-            if k == "fast_caching" or k.startswith("fast_caching."):
+            if k == "fastx_caching" or k.startswith("fastx_caching."):
                 del sys.modules[k]
 
 
@@ -192,7 +192,7 @@ def test_tasks_status_with_error_field() -> None:
     fake = types.ModuleType("fastx_platform.src.task")
     ft = MagicMock()
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     import sys
 
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
@@ -215,7 +215,7 @@ def test_tasks_dashboard_new_event_loop() -> None:
         return None
 
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
     sys.modules["fastx_platform.src"] = types.ModuleType("fastx_platform.src")
     sys.modules["fastx_platform.src.task"] = fake
@@ -240,7 +240,7 @@ def test_run_basic_inner_exception(tmp_path: Path, monkeypatch: pytest.MonkeyPat
             "fastx_cli.project_generation.click.prompt",
             side_effect=["p", str(tmp_path / "o"), "A", "a@a.co", "d", "0.1.0", "n"],
         ):
-            with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
+            with patch.object(FrameworkSourceLocator, "fastx_mvc_root", return_value=src):
                 with patch.object(
                     FrameworkSourceLocator,
                     "list_existing_template_items",

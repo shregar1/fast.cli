@@ -218,17 +218,17 @@ def test_cache_clear_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_caching" or name.startswith("fast_caching."):
-            raise ImportError("no fast_caching")
+        if name == "fastx_caching" or name.startswith("fastx_caching."):
+            raise ImportError("no fastx_caching")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_caching" or k.startswith("fast_caching."):
+        if k == "fastx_caching" or k.startswith("fastx_caching."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["cache", "clear"])
     assert r.exit_code == 0
-    assert "fast_caching" in r.output.lower()
+    assert "fastx_caching" in r.output.lower()
 
 
 def test_cache_invalidate_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -237,17 +237,17 @@ def test_cache_invalidate_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 
     def fake_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == "fast_caching" or name.startswith("fast_caching."):
-            raise ImportError("no fast_caching")
+        if name == "fastx_caching" or name.startswith("fastx_caching."):
+            raise ImportError("no fastx_caching")
         return real_import(name, *args, **kwargs)
 
     for k in list(sys.modules):
-        if k == "fast_caching" or k.startswith("fast_caching."):
+        if k == "fastx_caching" or k.startswith("fastx_caching."):
             del sys.modules[k]
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["cache", "invalidate", "tag1"])
     assert r.exit_code == 0
-    assert "fast_caching" in r.output.lower()
+    assert "fastx_caching" in r.output.lower()
 
 
 def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -267,7 +267,7 @@ def test_tasks_dashboard_keyboard_interrupt(monkeypatch: pytest.MonkeyPatch) -> 
     ft = MagicMock()
     ft.backend = Backend()
     m.TaskRegistry = TaskRegistry
-    m.fast_tasks = ft
+    m.fastx_tasks = ft
     monkeypatch.setitem(sys.modules, "fastx_platform", types.ModuleType("fastx_platform"))
     monkeypatch.setitem(sys.modules, "fastx_platform.src", types.ModuleType("fastx_platform.src"))
     monkeypatch.setitem(sys.modules, "fastx_platform.src.task", m)
@@ -338,7 +338,7 @@ def test_run_basic_email_default_from_config(
     with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
         with patch.object(
             FrameworkSourceLocator,
-            "fast_mvc_root",
+            "fastx_mvc_root",
             side_effect=RuntimeError("boom"),
         ):
 
@@ -480,7 +480,7 @@ def test_run_basic_venv_install(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     src.mkdir()
     (src / "f.py").write_text("x")
     with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
-        with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
+        with patch.object(FrameworkSourceLocator, "fastx_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
                 "list_existing_template_items",
@@ -554,7 +554,7 @@ def test_docs_ecosystem_no_src(tmp_path: Path) -> None:
     root = tmp_path / "proj"
     root.mkdir()
     (root / "docs" / "api").mkdir(parents=True)
-    eco = tmp_path / "fast_pkg"
+    eco = tmp_path / "fastx_pkg"
     eco.mkdir()
     (eco / "bare.py").write_text("#")
     MkdocsStyleReferenceGenerator(root)._write_ecosystem()
@@ -563,7 +563,7 @@ def test_docs_ecosystem_no_src(tmp_path: Path) -> None:
 def test_cache_clear_returns_false() -> None:
     import types
 
-    inner = types.ModuleType("fast_caching.src.fast_caching")
+    inner = types.ModuleType("fastx_caching.src.fastx_caching")
 
     class Backend:
         async def clear(self) -> bool:
@@ -575,15 +575,15 @@ def test_cache_clear_returns_false() -> None:
         async def invalidate(self, tags: list) -> int:
             return 0
 
-    inner.fast_cache = FC()
-    sys.modules["fast_caching"] = types.ModuleType("fast_caching")
-    sys.modules["fast_caching.src"] = types.ModuleType("fast_caching.src")
-    sys.modules["fast_caching.src.fast_caching"] = inner
+    inner.fastx_cache = FC()
+    sys.modules["fastx_caching"] = types.ModuleType("fastx_caching")
+    sys.modules["fastx_caching.src"] = types.ModuleType("fastx_caching.src")
+    sys.modules["fastx_caching.src.fastx_caching"] = inner
     try:
         assert CliRunner().invoke(cli, ["cache", "clear"]).exit_code == 0
     finally:
         for k in list(sys.modules):
-            if k == "fast_caching" or k.startswith("fast_caching."):
+            if k == "fastx_caching" or k.startswith("fastx_caching."):
                 del sys.modules[k]
 
 
@@ -654,7 +654,7 @@ def test_docs_ecosystem_skip_items(tmp_path: Path) -> None:
     root = tmp_path / "proj"
     root.mkdir()
     (root / "docs" / "api").mkdir(parents=True)
-    eco = tmp_path / "fast_skip"
+    eco = tmp_path / "fastx_skip"
     eco.mkdir()
     (eco / ".hidden").mkdir()
     (eco / "__pycache__").mkdir()
@@ -665,7 +665,7 @@ def test_docs_ecosystem_skip_items(tmp_path: Path) -> None:
 def test_cache_clear_new_event_loop(tmp_path: Path) -> None:
     import types
 
-    inner = types.ModuleType("fast_caching.src.fast_caching")
+    inner = types.ModuleType("fastx_caching.src.fastx_caching")
 
     class Backend:
         async def clear(self) -> bool:
@@ -677,17 +677,17 @@ def test_cache_clear_new_event_loop(tmp_path: Path) -> None:
         async def invalidate(self, tags: list) -> int:
             return 1
 
-    inner.fast_cache = FC()
-    sys.modules["fast_caching"] = types.ModuleType("fast_caching")
-    sys.modules["fast_caching.src"] = types.ModuleType("fast_caching.src")
-    sys.modules["fast_caching.src.fast_caching"] = inner
+    inner.fastx_cache = FC()
+    sys.modules["fastx_caching"] = types.ModuleType("fastx_caching")
+    sys.modules["fastx_caching.src"] = types.ModuleType("fastx_caching.src")
+    sys.modules["fastx_caching.src.fastx_caching"] = inner
     try:
         with patch("asyncio.get_event_loop", side_effect=RuntimeError("no loop")):
             assert CliRunner().invoke(cli, ["cache", "clear"]).exit_code == 0
             assert CliRunner().invoke(cli, ["cache", "invalidate", "t"]).exit_code == 0
     finally:
         for k in list(sys.modules):
-            if k == "fast_caching" or k.startswith("fast_caching."):
+            if k == "fastx_caching" or k.startswith("fastx_caching."):
                 del sys.modules[k]
 
 
@@ -707,7 +707,7 @@ def test_tasks_worker_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "worker"])
     assert r.exit_code == 0
-    assert "fast_tasks" in r.output.lower()
+    assert "fastx_tasks" in r.output.lower()
 
 
 def test_tasks_list_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -726,7 +726,7 @@ def test_tasks_list_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "list"])
     assert r.exit_code == 0
-    assert "fast_tasks" in r.output.lower()
+    assert "fastx_tasks" in r.output.lower()
 
 
 def test_tasks_status_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -745,7 +745,7 @@ def test_tasks_status_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "status", "tid"])
     assert r.exit_code == 0
-    assert "fast_tasks" in r.output.lower()
+    assert "fastx_tasks" in r.output.lower()
 
 
 def test_tasks_dashboard_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -764,4 +764,4 @@ def test_tasks_dashboard_import_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(builtins, "__import__", fake_import)
     r = CliRunner().invoke(cli, ["tasks", "dashboard"])
     assert r.exit_code == 0
-    assert "fast_tasks" in r.output.lower()
+    assert "fastx_tasks" in r.output.lower()

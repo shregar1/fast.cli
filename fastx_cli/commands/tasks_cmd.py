@@ -88,7 +88,7 @@ def tasks_status(task_id: str) -> None:
     """Check the status of a specific job."""
     output.print_banner()
     try:
-        from fastx_platform.src.task import fast_tasks
+        from fastx_platform.src.task import fastx_tasks
     except ImportError:
         output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
@@ -99,7 +99,7 @@ def tasks_status(task_id: str) -> None:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-    result = loop.run_until_complete(fast_tasks.backend.get_result(task_id))
+    result = loop.run_until_complete(fastx_tasks.backend.get_result(task_id))
     if not result:
         output.print_error(f"Task {task_id} not found.")
         return
@@ -127,7 +127,7 @@ def tasks_status(task_id: str) -> None:
 def tasks_dashboard(refresh: int) -> None:
     """📊 Live dashboard for FastTasks monitoring."""
     try:
-        from fastx_platform.src.task import TaskRegistry, fast_tasks
+        from fastx_platform.src.task import TaskRegistry, fastx_tasks
     except ImportError:
         output.print_error(OPTIONAL_DEPS_FAST_PLATFORM_ERROR)
         return
@@ -145,7 +145,7 @@ def tasks_dashboard(refresh: int) -> None:
         table.add_column("Last Run", style="dim")
         table.add_column("Success Rate", justify="right")
         for name, _meta in TaskRegistry.all_tasks().items():
-            result = loop.run_until_complete(fast_tasks.backend.get_result(name))
+            result = loop.run_until_complete(fastx_tasks.backend.get_result(name))
             status = result.status if result else "N/A"
             table.add_row(name, status, "Just now", "100%")
         return table

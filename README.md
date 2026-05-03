@@ -86,10 +86,8 @@ These values are merged into **`generate`** / **`new`** (non-interactive and int
 
 ## Global options
 
-| Option | Description |
-|--------|-------------|
-| `--version` | Print the package version and exit. |
-| `--help` | Show help for the root group or any subcommand. |
+- **`--version`** — Print the package version and exit.
+- **`--help`** — Show help for the root group or any subcommand.
 
 Discover everything at once:
 
@@ -100,33 +98,29 @@ fast <command> --help
 
 ### Terminal environment
 
-| Variable | Effect |
-|----------|--------|
-| `NO_COLOR` | Disables color ([standard](https://no-color.org/)); Rich respects it. |
-| `TERM=dumb` | Minimal capability terminal (colors/styles may be reduced). |
-| `FAST_CLI_MINIMAL_BANNER` | Set to `1` / `true` / `yes` for a short text banner instead of the large ASCII wordmark. |
-| `COLUMNS` | Terminal width; when very narrow (&lt; 56 columns), a compact banner is used automatically. |
+- **`NO_COLOR`** — Disables color ([standard](https://no-color.org/)); Rich respects it.
+- **`TERM=dumb`** — Minimal capability terminal (colors/styles may be reduced).
+- **`FAST_CLI_MINIMAL_BANNER`** — Set to `1` / `true` / `yes` for a short text banner instead of the large ASCII wordmark.
+- **`COLUMNS`** — Terminal width; when very narrow (&lt; 56 columns), a compact banner is used automatically.
 
 ---
 
 ## Command map
 
-| Area | Command | Purpose |
-|------|---------|---------|
-| **Projects** | `generate`, `new`, `quickstart` | Create a new FastMVC-style project (interactive or flags). |
-| **Scaffold** | `add resource` | Add a versioned API operation (DTOs, repo, service, controllers). |
-| **Scaffold (info)** | `add middleware`, `add auth`, `add test` | Print guidance only (templates not bundled in this package). |
-| **Env** | `env` | Generate `.env` from `.env.example` in the current project. |
-| **DB** | `db migrate`, `upgrade`, `downgrade`, `reset`, `history`, `status` | Alembic wrappers (run from a directory with `alembic.ini`). |
-| **Docs** | `docs generate`, `docs deploy` | Generate MkDocs-style reference stubs; deploy with `mkdocs gh-deploy`. |
-| **Cache** | `cache clear`, `cache invalidate` | Clear or tag-invalidate FastCaching (requires `fast_caching`). |
-| **Tasks** | `tasks worker`, `list`, `status`, `dashboard` | FastTasks / `fast_platform` workers (optional). |
-| **Cleanup** | `decimate` | Delete build/cache artifacts under a path. |
-| **Repo tooling** | `setup-commit-log` | Install commit-history recorder + pre-commit hook in any git repo. |
-| **Checkpoints** | `checkpoint save`, `list`, `show`, `revert` | Record `checkpoint.json` at the git root with safe commit SHAs; revert hints. **[Docs](docs/CHECKPOINTS.md)** |
-| **Diagnostics** | `doctor`, `check-env` | Python version, PATH tools (git, alembic, pre-commit), optional deps. |
-| **Shell** | `completion bash|zsh|fish` | Print Click 8 tab-completion script (requires `fast` on PATH). |
-| **Legacy** | `make` | Deprecated; forwards to `add` or `env`. |
+- **Projects** — Commands `generate`, `new`, `quickstart` — Create a new FastMVC-style project (interactive or flags).
+- **Scaffold** — `add resource` — Add a versioned API operation (DTOs, repo, service, controllers).
+- **Scaffold (info)** — `add middleware`, `add auth`, `add test` — Print guidance only (templates not bundled in this package).
+- **Env** — `env` — Generate `.env` from `.env.example` in the current project.
+- **DB** — `db migrate`, `upgrade`, `downgrade`, `reset`, `history`, `status` — Alembic wrappers (run from a directory with `alembic.ini`).
+- **Docs** — `docs generate`, `docs deploy` — Generate MkDocs-style reference stubs; deploy with `mkdocs gh-deploy`.
+- **Cache** — `cache clear`, `cache invalidate` — Clear or tag-invalidate FastCaching (requires `fastx_caching`).
+- **Tasks** — `tasks worker`, `list`, `status`, `dashboard` — FastTasks / `fastx_platform` workers (optional).
+- **Cleanup** — `decimate` — Delete build/cache artifacts under a path.
+- **Repo tooling** — `setup-commit-log` — Install commit-history recorder + pre-commit hook in any git repo.
+- **Checkpoints** — `checkpoint save`, `list`, `show`, `revert` — Record `checkpoint.json` at the git root with safe commit SHAs; revert hints. **[Docs](docs/CHECKPOINTS.md)**
+- **Diagnostics** — `doctor`, `check-env` — Python version, PATH tools (git, alembic, pre-commit), optional deps.
+- **Shell** — `completion bash|zsh|fish` — Print Click 8 tab-completion script (requires `fast` on PATH).
+- **Legacy** — `make` — Deprecated; forwards to `add` or `env`.
 
 ---
 
@@ -141,25 +135,21 @@ Commands: **`generate`**, **`new`** (alias), **`quickstart`**.
 
 ### Options (`generate` / `new`)
 
-| Option | Shorthand | Default | Description |
-|--------|-----------|---------|-------------|
-| `--name` | `-n` | — | Project name. |
-| `--path` | `-p` | — | Target directory (use `.` for current dir). |
-| `--author` | `-a` | — | Author name. |
-| `--email` | `-e` | — | Author email. |
-| `--description` | `-d` | — | Short project description. |
-| `--version` | `-v` | `0.1.0` | Initial project version string. |
-| `--venv` / `--no-venv` | — | `venv` on | Create a virtual environment. |
-| `--venv-name` | — | `.venv` | Virtualenv directory name. |
-| `--install-deps` / `--no-install-deps` | — | install on | Install dependencies after generation. |
+- **`--name`** (`-n`) — Project name.
+- **`--path`** (`-p`) — Target directory (use `.` for current dir).
+- **`--author`** (`-a`) — Author name.
+- **`--email`** (`-e`) — Author email.
+- **`--description`** (`-d`) — Short project description.
+- **`--version`** (`-v`, default `0.1.0`) — Initial project version string.
+- **`--venv` / `--no-venv`** (default: `venv` on) — Create a virtual environment.
+- **`--venv-name`** (default: `.venv`) — Virtualenv directory name.
+- **`--install-deps` / `--no-install-deps`** (default: install on) — Install dependencies after generation.
 
 ### Options (`quickstart`)
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--name` | `my_fastapi_project` | Project name. |
-| `--venv-name` | `.venv` | Virtualenv directory name. |
-| `--install-deps` / `--no-install-deps` | install on | Install dependencies after generation. |
+- **`--name`** (default: `my_fastapi_project`) — Project name.
+- **`--venv-name`** (default: `.venv`) — Virtualenv directory name.
+- **`--install-deps` / `--no-install-deps`** (default: install on) — Install dependencies after generation.
 
 ### Examples
 
@@ -179,12 +169,10 @@ Scaffolds a **single versioned operation** in an existing FastMVC layout: reques
 
 ### Options
 
-| Option | Shorthand | Required | Default | Description |
-|--------|-----------|----------|---------|-------------|
-| `--folder` | `-f` | yes | — | Folder segment (e.g. `user`, `auth`). |
-| `--resource` | `-r` | yes | — | Operation name (e.g. `fetch`, `create`). |
-| `--version` | `-v` | no | `v1` | API version (`v1`, `v2`, …). |
-| `--crud` / `--no-crud` | — | no | CRUD on | Reserved for future template variants. |
+- **`--folder`** (`-f`, required) — Folder segment (e.g. `user`, `auth`).
+- **`--resource`** (`-r`, required) — Operation name (e.g. `fetch`, `create`).
+- **`--version`** (`-v`, optional, default `v1`) — API version (`v1`, `v2`, …).
+- **`--crud` / `--no-crud`** (optional, default CRUD on) — Reserved for future template variants.
 
 ### Example
 
@@ -215,10 +203,8 @@ Group: **`db`**. These commands are thin wrappers around the **`alembic`** CLI. 
 
 Create a new revision.
 
-| Option | Shorthand | Description |
-|--------|-----------|-------------|
-| `--message` | `-m` | **Required.** Migration message. |
-| `--autogenerate` / `--no-autogenerate` | — | Autogenerate from models (default: on). |
+- **`--message`** (`-m`, **required**) — Migration message.
+- **`--autogenerate` / `--no-autogenerate`** — Autogenerate from models (default: on).
 
 ```bash
 fast db migrate -m "Add users table"
@@ -228,9 +214,7 @@ fast db migrate -m "Add users table"
 
 Apply migrations.
 
-| Option | Shorthand | Default | Description |
-|--------|-----------|---------|-------------|
-| `--revision` | `-r` | `head` | Revision to upgrade to. |
+- **`--revision`** (`-r`, default `head`) — Revision to upgrade to.
 
 ```bash
 fast db upgrade
@@ -241,9 +225,7 @@ fast db upgrade -r head
 
 Rollback migrations.
 
-| Option | Shorthand | Default | Description |
-|--------|-----------|---------|-------------|
-| `--revision` | `-r` | `-1` | Target revision (default one step back). |
+- **`--revision`** (`-r`, default `-1`) — Target revision (default one step back).
 
 Confirms before running (Questionary or Click confirm).
 
@@ -251,9 +233,7 @@ Confirms before running (Questionary or Click confirm).
 
 **Destructive:** drops all tables (downgrade to base) and reapplies migrations to `head`.
 
-| Option | Description |
-|--------|-------------|
-| `--seed` / `--no-seed` | If `--seed`, runs `scripts/seed.py` when present. |
+- **`--seed` / `--no-seed`** — If `--seed`, runs `scripts/seed.py` when present.
 
 Requires typing **`RESET`** to confirm.
 
@@ -261,9 +241,7 @@ Requires typing **`RESET`** to confirm.
 
 Show migration history.
 
-| Option | Shorthand | Description |
-|--------|-----------|-------------|
-| `--verbose` / `--no-verbose` | `-v` | More detail from `alembic history`. |
+- **`--verbose` / `--no-verbose`** (`-v`) — More detail from `alembic history`.
 
 ### `db status`
 
@@ -277,7 +255,7 @@ Group: **`docs`**.
 
 ### `docs generate`
 
-Walks **`apis/`** and **`dtos/`** and writes Markdown under **`docs/api/`** (e.g. `endpoints.md`, `dtos.md`, optional `ecosystem.md` for sibling `fast_*` packages). Uses mkdocstrings-style `:::` directives for a later MkDocs build.
+Walks **`apis/`** and **`dtos/`** and writes Markdown under **`docs/api/`** (e.g. `endpoints.md`, `dtos.md`, optional `ecosystem.md` for sibling `fastx_*` packages). Uses mkdocstrings-style `:::` directives for a later MkDocs build.
 
 ```bash
 fast docs generate
@@ -287,9 +265,7 @@ fast docs generate
 
 Runs **`mkdocs gh-deploy`** with an optional commit message.
 
-| Option | Shorthand | Default |
-|--------|-----------|---------|
-| `--message` | `-m` | `Deploy documentation` |
+- **`--message`** (`-m`, default `Deploy documentation`)
 
 ```bash
 fast docs deploy -m "Update API docs"
@@ -299,7 +275,7 @@ fast docs deploy -m "Update API docs"
 
 ## Caching (`cache`)
 
-Group: **`cache`**. Requires the **`fast_caching`** package importable in your environment.
+Group: **`cache`**. Requires the **`fastx_caching`** package importable in your environment.
 
 ### `cache clear`
 
@@ -317,14 +293,12 @@ fast cache invalidate user-list product-cache
 
 ## Background tasks (`tasks`)
 
-Group: **`tasks`**. Uses **`fast_platform`** task APIs when available.
+Group: **`tasks`**. Uses **`fastx_platform`** task APIs when available.
 
-| Command | Description |
-|---------|-------------|
-| `tasks worker` | Start a background worker. `--concurrency` / `-c` (default `10`). |
-| `tasks list` | List registered task definitions. |
-| `tasks status <task_id>` | Show status for one job. |
-| `tasks dashboard` | Live table (refresh `--refresh` / `-r` ms, default `1000`). Ctrl+C to exit. |
+- **`tasks worker`** — Start a background worker. `--concurrency` / `-c` (default `10`).
+- **`tasks list`** — List registered task definitions.
+- **`tasks status <task_id>`** — Show status for one job.
+- **`tasks dashboard`** — Live table (refresh `--refresh` / `-r` ms, default `1000`). Ctrl+C to exit.
 
 ```bash
 fast tasks worker -c 8
@@ -339,7 +313,7 @@ Command: **`decimate [LANGUAGE] [PATH]`**.
 
 **Destructive:** removes build/cache artifacts matching built-in patterns. Defaults: language `python`, path `.`.
 
-Supported language keys include **`python`**, **`java`**, **`rust`** (see `ARTIFACTS_BY_LANGUAGE` in `fast_cli.constants`). Virtualenv directories such as `.venv` are skipped during traversal.
+Supported language keys include **`python`**, **`java`**, **`rust`** (see `ARTIFACTS_BY_LANGUAGE` in `fastx_cli.constants`). Virtualenv directories such as `.venv` are skipped during traversal.
 
 ```bash
 fast decimate python .
@@ -357,11 +331,9 @@ Installs the bundled **`git_log_recorder.py`** into **`_maint/scripts/`**, merge
 - `coverage_output.txt`
 - `commit_history.json`
 
-| Option | Description |
-|--------|-------------|
-| `-C`, `--path` | Git repository root (default: current directory). |
-| `--install-hooks` / `--no-install-hooks` | Run `pre-commit install` and `pre-commit install --hook-type post-commit` (default: install). |
-| `--with-common-hooks` | When **creating** a new `.pre-commit-config.yaml`, also add common hooks (trim whitespace, YAML/JSON checks, etc.). |
+- **`-C`, `--path`** — Git repository root (default: current directory).
+- **`--install-hooks` / `--no-install-hooks`** — Run `pre-commit install` and `pre-commit install --hook-type post-commit` (default: install).
+- **`--with-common-hooks`** — When **creating** a new `.pre-commit-config.yaml`, also add common hooks (trim whitespace, YAML/JSON checks, etc.).
 
 ```bash
 fast setup-commit-log
@@ -387,12 +359,10 @@ Record **safe git commit markers** in **`checkpoint.json`** at the **git reposit
 
 Full reference: **[docs/CHECKPOINTS.md](docs/CHECKPOINTS.md)** (also linked from PyPI as **Checkpoints**).
 
-| Command | Description |
-|--------|-------------|
-| `fast checkpoint save [-m "note"]` | Store current **HEAD** (fails if working tree is dirty unless `--allow-dirty`). |
-| `fast checkpoint list` | Show saved checkpoints. |
-| `fast checkpoint show <id>` | Print metadata and suggested `git` commands. |
-| `fast checkpoint revert <id>` | Dry-run by default; add **`--execute`** to run `git reset --hard` (confirm with **`--yes`** to skip prompt). |
+- **`fast checkpoint save [-m "note"]`** — Store current **HEAD** (fails if working tree is dirty unless `--allow-dirty`).
+- **`fast checkpoint list`** — Show saved checkpoints.
+- **`fast checkpoint show <id>`** — Print metadata and suggested `git` commands.
+- **`fast checkpoint revert <id>`** — Dry-run by default; add **`--execute`** to run `git reset --hard` (confirm with **`--yes`** to skip prompt).
 
 ```bash
 cd /path/to/your/git/repo
@@ -418,10 +388,8 @@ Deprecated. Use **`add`** or **`env`** instead.
 
 ## Related repositories
 
-| | |
-|--|--|
-| **FastMVC framework** (sibling checkout) | `../fast_mvc` |
-| **GitHub** | [github.com/shregar1/fast.mvc](https://github.com/shregar1/fast.mvc) |
+- **FastMVC framework** (sibling checkout) — `../fastx_mvc`
+- **GitHub** — [github.com/shregar1/fast.mvc](https://github.com/shregar1/fast.mvc)
 
 This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](https://github.com/fastmvc/fast.cli). The PyPI distribution is **`fastmvc-cli`**.
 
@@ -429,7 +397,7 @@ This repo’s **`package metadata`** references [github.com/fastmvc/fast.cli](ht
 
 ## Publishing to PyPI
 
-The PyPI project name is **`fastmvc-cli`** (`name` in `pyproject.toml`). Create it under your PyPI account on first successful upload. Bump **`__version__`** in `fast_cli/__init__.py` before each release.
+The PyPI project name is **`fastmvc-cli`** (`name` in `pyproject.toml`). Create it under your PyPI account on first successful upload. Bump **`__version__`** in `fastx_cli/__init__.py` before each release.
 
 **Maintainer checklist** (tags, CI, wheel smoke test, rollback): **[RELEASING.md](RELEASING.md)**.
 
@@ -451,7 +419,7 @@ Install build tools (included in the **`dev`** extra):
 
 ```bash
 pip install "fastmvc-cli[dev]"   # or: pip install build twine
-python -m build               # writes dist/fast_cli-*.tar.gz and .whl
+python -m build               # writes dist/fastx_cli-*.tar.gz and .whl
 twine check dist/*
 ```
 
@@ -484,15 +452,15 @@ git tag v1.5.1
 git push origin v1.5.1
 ```
 
-The tag should match **`__version__`** in `fast_cli/__init__.py`.
+The tag should match **`__version__`** in `fastx_cli/__init__.py`.
 
 ---
 
 ## Layout
 
-```
+```text
 fast.cli/
-├── fast_cli/
+├── fastx_cli/
 │   ├── app.py              # CLI entry point
 │   ├── bundled/          # git_log_recorder.py (source for setup-commit-log)
 │   └── commands/         # Command groups and implementations

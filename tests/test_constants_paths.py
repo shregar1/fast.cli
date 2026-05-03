@@ -25,29 +25,29 @@ def test_framework_locator_repo_root(tmp_path: Path) -> None:
     assert loc.repo_root == tmp_path
 
 
-def test_fast_mvc_root_prefers_repo_child(tmp_path: Path) -> None:
+def test_fastx_mvc_root_prefers_repo_child(tmp_path: Path) -> None:
     pkg = tmp_path / "fastx_cli"
     pkg.mkdir()
-    mvc = tmp_path / "fast_mvc"
+    mvc = tmp_path / "fastx_mvc"
     mvc.mkdir()
     loc = FrameworkSourceLocator(package_dir=pkg)
-    assert loc.fast_mvc_root() == mvc
+    assert loc.fastx_mvc_root() == mvc
 
 
-def test_fast_mvc_root_fallback_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fastx_mvc_root_fallback_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     pkg = tmp_path / "pkg" / "fastx_cli"
     pkg.mkdir(parents=True)
-    mvc = tmp_path / "fast_mvc"
+    mvc = tmp_path / "fastx_mvc"
     mvc.mkdir()
     monkeypatch.chdir(tmp_path)
     loc = FrameworkSourceLocator(package_dir=pkg)
-    assert loc.fast_mvc_root() == mvc
+    assert loc.fastx_mvc_root() == mvc
 
 
 def test_list_existing_template_items(tmp_path: Path) -> None:
     pkg = tmp_path / "fastx_cli"
     pkg.mkdir()
-    mvc = tmp_path / "fast_mvc"
+    mvc = tmp_path / "fastx_mvc"
     mvc.mkdir()
     (mvc / "app.py").write_text("# x")
     loc = FrameworkSourceLocator(package_dir=pkg)

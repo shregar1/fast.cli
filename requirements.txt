@@ -12,8 +12,8 @@ pytest-cov>=4.0
 pytest-mock>=3.0
 
 # FastMVC Core Ecosystem (installed in editable mode)
--e ../fast_platform
--e ../fast_middleware
--e ../fast_database
--e ../fast_dashboards
--e ../fast_mvc
+-e ../fastx_platform
+-e ../fastx_middleware
+-e ../fastx_database
+-e ../fastx_dashboards
+-e ../fastx_mvc

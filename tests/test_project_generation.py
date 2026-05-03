@@ -22,7 +22,7 @@ def test_execute_pipeline_full_mock(tmp_path: Path) -> None:
         "venv_name": ".venv",
     }
     with patch.object(orch, "_locator") as loc:
-        loc.fast_mvc_root.return_value = tmp_path / "src"
+        loc.fastx_mvc_root.return_value = tmp_path / "src"
         loc.list_existing_template_items.return_value = []
         orch._copier.copy_with_progress = MagicMock(return_value=0)
         orch._bootstrap.create_project_structure = MagicMock()
@@ -72,7 +72,7 @@ def test_run_basic_flow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     src.mkdir()
     (src / "app.py").write_text("x")
     with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
-        with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
+        with patch.object(FrameworkSourceLocator, "fastx_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
                 "list_existing_template_items",
@@ -144,7 +144,7 @@ def test_run_basic_oserror_pass(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     src.mkdir()
     (src / "d").mkdir()
     with patch("fastx_cli.project_generation.HAS_QUESTIONARY", False):
-        with patch.object(FrameworkSourceLocator, "fast_mvc_root", return_value=src):
+        with patch.object(FrameworkSourceLocator, "fastx_mvc_root", return_value=src):
             with patch.object(
                 FrameworkSourceLocator,
                 "list_existing_template_items",

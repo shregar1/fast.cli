@@ -16,7 +16,7 @@ def test_cache_clear_import_error_isolated() -> None:
 import builtins
 _real = builtins.__import__
 def _imp(name, globals=None, locals=None, fromlist=(), level=0):
-    if name == "fast_caching" or (name or "").startswith("fast_caching."):
+    if name == "fastx_caching" or (name or "").startswith("fastx_caching."):
         raise ImportError("blocked")
     return _real(name, globals, locals, fromlist, level)
 builtins.__import__ = _imp

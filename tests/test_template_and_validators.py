@@ -41,19 +41,23 @@ def test_template_renderer_binary_skip(tmp_path: Path) -> None:
     TemplateRenderer().process_file(p, _ctx())  # should not raise
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="chmod read-only not reliable on Windows")
 def test_template_renderer_read_error(tmp_path: Path) -> None:
     p = tmp_path / "ro.txt"
     p.write_text("{{PROJECT_NAME}}")
-    p.chmod(0)
-    try:
-        TemplateRenderer().process_file(p, _ctx())
-    finally:
-        p.chmod(0o644)
+    if sys.platform == "win32":
+        from unittest.mock import patch
+
+        with patch.object(Path, "read_text", side_effect=PermissionError("denied")):
+            TemplateRenderer().process_file(p, _ctx())
+    else:
+        p.chmod(0)
+        try:
+            TemplateRenderer().process_file(p, _ctx())
+        finally:
+            p.chmod(0o644)
 
 
 def test_validators_with_questionary() -> None:
-    pytest.importorskip("questionary")
     from fastx_cli.validators import (
         HAS_QUESTIONARY,
         EmailValidator,

@@ -1,12 +1,12 @@
 """Locate FastMVC framework sources on disk.
 
-The generator must find the directory that contains the ``fast_mvc`` package
-(or equivalent) to copy into a new project. Resolution order:
+The generator must find the directory that contains the FastX MVC framework tree
+(typically the ``fastx_mvc`` repo checkout) to copy into a new project. Resolution order:
 
-1. ``<repo_root>/fast_mvc`` where ``repo_root`` is the parent of the installed
+1. ``<repo_root>/fastx_mvc`` where ``repo_root`` is the parent of the installed
    ``fastx_cli`` package (editable installs or monorepo checkouts).
-2. If missing, ``./fast_mvc`` under the current working directory.
-3. Otherwise ``fast_mvc`` next to the package (legacy layout).
+2. If missing, ``./fastx_mvc`` under the current working directory.
+3. Otherwise ``fastx_mvc`` next to the package (legacy layout).
 
 This allows both monorepo development and pip-installed CLI usage without
 bundling the full framework inside the wheel.
@@ -20,7 +20,7 @@ from fastx_cli.constants import DEFAULT_TEMPLATE_ITEMS, FRAMEWORK_PACKAGE_NAME
 
 
 class FrameworkSourceLocator:
-    """Resolve ``fast_mvc`` on disk and filter template candidate paths.
+    """Resolve the framework source tree (see :meth:`fastx_mvc_root`) on disk.
 
     Parameters
     ----------
@@ -42,14 +42,14 @@ class FrameworkSourceLocator:
         """Filesystem root of the repository checkout (parent of ``fastx_cli``)."""
         return self._package_dir.parent
 
-    def fast_mvc_root(self) -> Path:
-        """Directory containing framework package sources (e.g. ``fast_mvc/``).
+    def fastx_mvc_root(self) -> Path:
+        """Directory containing framework package sources (e.g. ``fastx_mvc/``).
 
         Returns
         -------
         pathlib.Path
             Path to the framework tree. May not exist if the user runs the CLI
-            without a local ``fast_mvc`` checkout; callers should handle empty
+            without a local ``fastx_mvc`` checkout; callers should handle empty
             template lists.
         """
         candidates = [
@@ -64,6 +64,6 @@ class FrameworkSourceLocator:
         return candidates[0]
 
     def list_existing_template_items(self) -> list[str]:
-        """Return only template entries that exist under :meth:`fast_mvc_root`."""
-        source = self.fast_mvc_root()
+        """Return only template entries that exist under :meth:`fastx_mvc_root`."""
+        source = self.fastx_mvc_root()
         return [item for item in DEFAULT_TEMPLATE_ITEMS if (source / item).exists()]

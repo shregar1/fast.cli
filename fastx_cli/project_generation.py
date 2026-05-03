@@ -3,7 +3,7 @@
 The :class:`ProjectGenerationOrchestrator` is the **application service** for
 project scaffolding. It wires together:
 
-* :class:`fastx_cli.paths.FrameworkSourceLocator` — find ``fast_mvc`` sources
+* :class:`fastx_cli.paths.FrameworkSourceLocator` — find ``fastx_mvc`` sources
 * :class:`fastx_cli.file_copy.ProjectCopier` — copy with progress + templates
 * :class:`fastx_cli.project_setup.ProjectBootstrap` — extra dirs, ``pyproject.toml``, ``.env``
 * :class:`fastx_cli.github_workflows.GitHubWorkflowsCopier` — optional CI YAML
@@ -319,7 +319,7 @@ class ProjectGenerationOrchestrator:
         }
 
         try:
-            source = self._locator.fast_mvc_root()
+            source = self._locator.fastx_mvc_root()
             items = self._locator.list_existing_template_items()
             with Progress(
                 SpinnerColumn(),
@@ -452,7 +452,7 @@ class ProjectGenerationOrchestrator:
         ``context`` must include ``create_venv``, ``install_deps``, and
         ``init_precommit`` (interactive) or sensible defaults (CLI/quickstart).
         """
-        source = self._locator.fast_mvc_root()
+        source = self._locator.fastx_mvc_root()
         items = self._locator.list_existing_template_items()
         output.console.print(f"\n[bold cyan]Source:[/bold cyan] {source}")
         output.console.print(f"[bold cyan]Target:[/bold cyan] {target_path}")

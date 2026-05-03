@@ -74,7 +74,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Ruff check
-        run: ruff check fast_cli tests
+        run: ruff check fastx_cli tests
 
       - name: Mypy
-        run: mypy fast_cli
+        run: mypy fastx_cli

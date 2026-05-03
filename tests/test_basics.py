@@ -24,9 +24,9 @@ def test_resolve_fastmvc_project_root_with_pyproject(tmp_path: Path) -> None:
     assert resolve_fastmvc_project_root(tmp_path) == tmp_path
 
 
-def test_resolve_fastmvc_project_root_fast_mvc_only(tmp_path: Path) -> None:
-    (tmp_path / "fast_mvc").mkdir()
-    assert resolve_fastmvc_project_root(tmp_path) == tmp_path / "fast_mvc"
+def test_resolve_fastmvc_project_root_framework_dir_only(tmp_path: Path) -> None:
+    (tmp_path / "fastx_mvc").mkdir()
+    assert resolve_fastmvc_project_root(tmp_path) == tmp_path / "fastx_mvc"
 
 
 def test_output_methods() -> None:
@@ -48,7 +48,7 @@ def test_main_invokes_cli() -> None:
         mock_cli.assert_called_once()
 
 
-def test_fast_cli_main_block() -> None:
+def test_fastx_cli_main_block() -> None:
     import runpy
 
     with patch("fastx_cli.app.main") as mock_main:

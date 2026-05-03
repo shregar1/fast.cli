@@ -89,7 +89,7 @@ def test_mkdocs_ecosystem_branch(tmp_path: Path) -> None:
     root = tmp_path / "proj"
     root.mkdir()
     (root / "docs" / "api").mkdir(parents=True)
-    eco = tmp_path / "fast_other"
+    eco = tmp_path / "fastx_other"
     eco.mkdir()
     (eco / "src").mkdir()
     (eco / "src" / "mod.py").write_text("x")

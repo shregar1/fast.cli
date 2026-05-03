@@ -57,7 +57,7 @@ def test_run_basic_outer_exception(tmp_path: Path, monkeypatch: pytest.MonkeyPat
         ):
             with patch.object(
                 FrameworkSourceLocator,
-                "fast_mvc_root",
+                "fastx_mvc_root",
                 side_effect=RuntimeError("boom"),
             ):
                 r = CliRunner().invoke(cli, ["generate"])

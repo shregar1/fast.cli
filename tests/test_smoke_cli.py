@@ -91,4 +91,10 @@ def test_entry_point_console_scripts_resolve() -> None:
         )
         assert p.returncode == 0
         return
-    pytest.skip("Console scripts not on PATH (use python -m fastx_cli.app)")
+    p = subprocess.run(
+        [sys.executable, "-m", "fastx_cli.app", "--help"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    assert p.returncode == 0, p.stderr

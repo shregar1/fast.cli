@@ -101,7 +101,7 @@ def register_doctor_commands(cli: click.Group) -> None:
         opt_table.add_column("Status")
         opt_table.add_column("Version")
         optional = [
-            ("fast_caching", "fast-caching"),
+            ("fastx_caching", "fast-caching"),
             ("fastx_platform", "fast-platform"),
             ("questionary", "questionary"),
         ]

@@ -1,6 +1,6 @@
 """FastCaching admin commands (optional dependency).
 
-These commands import ``fast_caching`` at runtime. If the package is not
+These commands import ``fastx_caching`` at runtime. If the package is not
 installed in the active environment, the CLI prints an error and returns
 without raising—mirroring the original behaviour for optional ecosystem tools.
 
@@ -37,7 +37,7 @@ def cache_clear() -> None:
     """Purge all resident cache data."""
     output.print_banner()
     try:
-        from fast_caching.src.fast_caching import fast_cache
+        from fastx_caching.src.fastx_caching import fastx_cache
     except ImportError:
         output.print_error(OPTIONAL_DEPS_FAST_CACHING_ERROR)
         return
@@ -53,7 +53,7 @@ def cache_clear() -> None:
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        success = loop.run_until_complete(fast_cache.backend.clear())
+        success = loop.run_until_complete(fastx_cache.backend.clear())
         progress.update(task, completed=True)
 
     if success:
@@ -72,7 +72,7 @@ def cache_invalidate(tags: tuple[str, ...]) -> None:
 
     output.print_banner()
     try:
-        from fast_caching.src.fast_caching import fast_cache
+        from fastx_caching.src.fastx_caching import fastx_cache
     except ImportError:
         output.print_error(OPTIONAL_DEPS_FAST_CACHING_ERROR)
         return
@@ -90,7 +90,7 @@ def cache_invalidate(tags: tuple[str, ...]) -> None:
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        count = loop.run_until_complete(fast_cache.invalidate(list(tags)))
+        count = loop.run_until_complete(fastx_cache.invalidate(list(tags)))
         progress.update(task, completed=True)
 
     output.print_success(

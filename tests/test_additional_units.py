@@ -37,7 +37,7 @@ def test_new_command_invokes_pipeline(tmp_path: Path) -> None:
     pipe.assert_called_once()
 
 
-def test_fast_cli_cli_shim_same_objects() -> None:
+def test_fastx_cli_cli_shim_same_objects() -> None:
     from fastx_cli.app import cli as app_cli
     from fastx_cli.app import main as app_main
     from fastx_cli.cli import cli as shim_cli
@@ -69,7 +69,7 @@ def test_cli_output_all_methods_capture() -> None:
     assert "Step 1" in text
 
 
-def test_python_m_fast_cli_help() -> None:
+def test_python_m_fastx_cli_help() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     env = {**os.environ, "PYTHONPATH": str(repo_root)}
     r = subprocess.run(

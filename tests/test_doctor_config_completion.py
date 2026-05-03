@@ -39,7 +39,7 @@ def test_check_env_alias() -> None:
     assert r.exit_code == 0
 
 
-def test_completion_requires_fast_on_path() -> None:
+def test_completion_requires_fastx_on_path() -> None:
     with patch("fastx_cli.commands.completion_cmd.shutil.which", return_value=None):
         r = CliRunner().invoke(cli, ["completion", "bash"])
         assert r.exit_code == 1
@@ -211,7 +211,7 @@ def test_doctor_tool_hints() -> None:
     assert "pip install alembic" in dc._tool_install_hint("alembic")
     assert "pre-commit" in dc._tool_install_hint("pre-commit").lower()
     assert "python" in dc._tool_install_hint("python3").lower()
-    assert "fastmvc-cli" in dc._optional_install_hint("questionary")
+    assert "fastx-cli" in dc._optional_install_hint("questionary").lower()
 
 
 @pytest.mark.parametrize(

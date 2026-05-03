@@ -222,17 +222,13 @@ class GenerationSummaryPresenter:
 
         output.console.print("\n[bold]🚀 Example API is ready![/bold]")
         code = """from fastapi import FastAPI
-from fast_mvc.example.controllers.item_controller import router as item_router
+# Wire routers from your scaffolded controllers, e.g.:
+# from controllers.apis.v1 import router as api_v1
 
 app = FastAPI()
-app.include_router(item_router)
+# app.include_router(api_v1)
 
-# Try these endpoints:
-# POST   /items          - Create item
-# GET    /items          - List items
-# GET    /items/{id}     - Get item
-# PATCH  /items/{id}     - Update item
-# DELETE /items/{id}     - Delete item"""
+# Add routes and OpenAPI tags as you flesh out controllers."""
         output.console.print(Syntax(code, "python", theme="monokai", line_numbers=True))
         output.console.print(
             "\n[italic dim #94a3b8]Happy coding with FastX · ship something great[/italic dim #94a3b8]\n"

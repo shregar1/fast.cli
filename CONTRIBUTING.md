@@ -20,13 +20,13 @@ Run the test suite (same command as CI):
 python -m pytest
 ```
 
-Coverage is enforced at **≥ 99%** for `fast_cli` (see `pyproject.toml`).
+Coverage is enforced at **≥ 99%** for `fastx_cli` (see `pyproject.toml`).
 
 Linting (also run in CI’s **`lint`** job):
 
 ```bash
-ruff check fast_cli tests
-mypy fast_cli
+ruff check fastx_cli tests
+mypy fastx_cli
 ```
 
 Optional: install [pre-commit](https://pre-commit.com/) hooks from the repo root:
@@ -39,12 +39,12 @@ pre-commit install
 
 Short version:
 
-1. Update **`__version__`** in **`fast_cli/__init__.py`** (and **`CHANGELOG.md`**).
+1. Update **`__version__`** in **`fastx_cli/__init__.py`** (and **`CHANGELOG.md`**).
 2. Tag **`vX.Y.Z`** and push the tag; **publish-pypi.yml** runs tests, smoke-installs the wheel, then uploads to PyPI (trusted publishing).
 
 Full checklist, PyPI verification, rollback (yank / patch), and local dry run: **[RELEASING.md](RELEASING.md)**.
 
-The tag and **`fast_cli.__version__`** must match.
+The tag and **`fastx_cli.__version__`** must match.
 
 ## Code style
 

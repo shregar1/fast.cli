@@ -10,7 +10,7 @@ This document is the checklist for maintainers. It complements [CONTRIBUTING.md]
 ## Standard release (tag → PyPI)
 
 1. **Changelog** — Add/update [CHANGELOG.md](CHANGELOG.md) for this version (date, highlights, fixes).
-2. **Version** — Set **`fast_cli/__init__.py`** `__version__` to the new semantic version (e.g. `1.5.1`).
+2. **Version** — Set **`fastx_cli/__init__.py`** `__version__` to the new semantic version (e.g. `1.5.1`).
 3. **Commit** — Single commit or PR: e.g. `chore: release 1.5.1`.
 4. **Tag** — Create an annotated tag matching the version with a `v` prefix:
 
@@ -22,7 +22,7 @@ This document is the checklist for maintainers. It complements [CONTRIBUTING.md]
 5. **Automation** — [publish-pypi.yml](.github/workflows/publish-pypi.yml) runs on `v*` tags:
    - Runs the **test suite** on the tagged commit.
    - Builds **sdist + wheel**.
-   - **Smoke-installs** the wheel in a fresh venv and runs `python -m fast_cli.app --help` and `doctor`.
+   - **Smoke-installs** the wheel in a fresh venv and runs `python -m fastx_cli.app --help` and `doctor`.
    - Uploads to **PyPI** via OIDC (no long-lived token in the repo).
 
 6. **Verify on PyPI** — Confirm the new version appears at `https://pypi.org/project/fastmvc-cli/#history` and that files match the tag.
@@ -60,7 +60,7 @@ python -m build
 python -m venv .venv-dist
 # POSIX:
 .venv-dist/bin/pip install dist/*.whl
-.venv-dist/bin/python -m fast_cli.app --help
+.venv-dist/bin/python -m fastx_cli.app --help
 # Inspect dist/ before any real tag push.
 ```
 

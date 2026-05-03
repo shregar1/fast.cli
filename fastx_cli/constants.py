@@ -91,7 +91,7 @@ DEFAULT_AUTHOR_NAME: str = "Developer"
 DEFAULT_PROJECT_NAME: str = "my_fastapi_project"
 
 # Framework
-FRAMEWORK_PACKAGE_NAME: str = "fast_mvc"
+FRAMEWORK_PACKAGE_NAME: str = "fastx_mvc"
 FRAMEWORK_CONTROLLER_PATH: str = "abstractions/controller.py"
 
 # File names
@@ -154,10 +154,10 @@ TEMPLATE_PLACEHOLDER_BCRYPT_SALT: str = "{{BCRYPT_SALT}}"
 TEMPLATE_PLACEHOLDER_APP_PORT: str = "{{APP_PORT}}"
 
 # Optional dependency errors
-OPTIONAL_DEPS_FAST_CACHING_IMPORT: str = "fast_caching.src.fast_caching"
-OPTIONAL_DEPS_FAST_CACHING_ERROR: str = "fast_caching package not found in paths"
+OPTIONAL_DEPS_FAST_CACHING_IMPORT: str = "fastx_caching.src.fastx_caching"
+OPTIONAL_DEPS_FAST_CACHING_ERROR: str = "fastx_caching package not found in paths"
 OPTIONAL_DEPS_FAST_PLATFORM_IMPORT: str = "fastx_platform.src.task"
-OPTIONAL_DEPS_FAST_PLATFORM_ERROR: str = "fast_tasks package not found in paths"
+OPTIONAL_DEPS_FAST_PLATFORM_ERROR: str = "fastx_tasks package not found in paths"
 
 # Venv / decimate
 VENV_EXCLUDE_DIRS: frozenset[str] = frozenset({".git", ".venv", "venv", "ENV", "env"})

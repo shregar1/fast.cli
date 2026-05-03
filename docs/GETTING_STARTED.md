@@ -48,7 +48,7 @@ From anywhere:
 fast doctor
 ```
 
-You should see **Python**, **fast_cli** version, **PATH tools** (git, alembic, pre-commit, …), and **optional Python packages**. If something is missing, **`doctor`** suggests install commands.
+You should see **Python**, **fastx_cli** version, **PATH tools** (git, alembic, pre-commit, …), and **optional Python packages**. If something is missing, **`doctor`** suggests install commands.
 
 ## 4. Open the generated project (5+ min)
 

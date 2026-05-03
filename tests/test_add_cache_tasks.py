@@ -20,8 +20,8 @@ def _fastmvc_project(tmp_path: Path) -> Path:
     return root
 
 
-def _install_fake_fast_caching() -> None:
-    inner = types.ModuleType("fast_caching.src.fast_caching")
+def _install_fake_fastx_caching() -> None:
+    inner = types.ModuleType("fastx_caching.src.fastx_caching")
 
     class Backend:
         async def clear(self) -> bool:
@@ -33,15 +33,15 @@ def _install_fake_fast_caching() -> None:
         async def invalidate(self, tags: list) -> int:
             return len(tags)
 
-    inner.fast_cache = FC()
-    sys.modules["fast_caching"] = types.ModuleType("fast_caching")
-    sys.modules["fast_caching.src"] = types.ModuleType("fast_caching.src")
-    sys.modules["fast_caching.src.fast_caching"] = inner
+    inner.fastx_cache = FC()
+    sys.modules["fastx_caching"] = types.ModuleType("fastx_caching")
+    sys.modules["fastx_caching.src"] = types.ModuleType("fastx_caching.src")
+    sys.modules["fastx_caching.src.fastx_caching"] = inner
 
 
-def _remove_fake_fast_caching() -> None:
+def _remove_fake_fastx_caching() -> None:
     for k in list(sys.modules):
-        if k == "fast_caching" or k.startswith("fast_caching."):
+        if k == "fastx_caching" or k.startswith("fastx_caching."):
             del sys.modules[k]
 
 
@@ -92,13 +92,13 @@ def test_resource_scaffolder_write(tmp_path: Path) -> None:
 
 
 def test_cache_clear_success() -> None:
-    _install_fake_fast_caching()
+    _install_fake_fastx_caching()
     try:
         runner = CliRunner()
         r = runner.invoke(cli, ["cache", "clear"])
         assert r.exit_code == 0
     finally:
-        _remove_fake_fast_caching()
+        _remove_fake_fastx_caching()
 
 
 def test_cache_invalidate_no_tags() -> None:
@@ -108,13 +108,13 @@ def test_cache_invalidate_no_tags() -> None:
 
 
 def test_cache_invalidate_success() -> None:
-    _install_fake_fast_caching()
+    _install_fake_fastx_caching()
     try:
         runner = CliRunner()
         r = runner.invoke(cli, ["cache", "invalidate", "a", "b"])
         assert r.exit_code == 0
     finally:
-        _remove_fake_fast_caching()
+        _remove_fake_fastx_caching()
 
 
 def test_tasks_worker_keyboardinterrupt() -> None:
@@ -184,7 +184,7 @@ def test_tasks_status_not_found() -> None:
         return None
 
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
     sys.modules["fastx_platform.src"] = types.ModuleType("fastx_platform.src")
     sys.modules["fastx_platform.src.task"] = fake
@@ -211,7 +211,7 @@ def test_tasks_status_found() -> None:
     fake = types.ModuleType("fastx_platform.src.task")
     ft = MagicMock()
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
     sys.modules["fastx_platform.src"] = types.ModuleType("fastx_platform.src")
     sys.modules["fastx_platform.src.task"] = fake
@@ -238,7 +238,7 @@ def test_tasks_status_running_style() -> None:
     fake = types.ModuleType("fastx_platform.src.task")
     ft = MagicMock()
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
     sys.modules["fastx_platform.src"] = types.ModuleType("fastx_platform.src")
     sys.modules["fastx_platform.src.task"] = fake
@@ -261,7 +261,7 @@ def test_tasks_dashboard_interrupt() -> None:
         return None
 
     ft.backend.get_result = get_result
-    fake.fast_tasks = ft
+    fake.fastx_tasks = ft
     sys.modules["fastx_platform"] = types.ModuleType("fastx_platform")
     sys.modules["fastx_platform.src"] = types.ModuleType("fastx_platform.src")
     sys.modules["fastx_platform.src.task"] = fake
