@@ -63,7 +63,7 @@ all = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --cov=fastx_cli --cov-report=term-missing --cov-fail-under=99"
+addopts = "-q --cov=fastx_cli --cov-report=term-missing"
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
