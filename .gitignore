@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+# Nested __pycache__ e.g. src/**/__pycache__/module.cpython-313.pyc
 __pycache__/
 *.py[codz]
 *$py.class
