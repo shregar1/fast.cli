@@ -211,6 +211,9 @@ coverage_output.txt
 commit_history.json
 test.txt
 
+# FastX local artifacts (recordings, cache)
+.fastx/
+
 # Archives
 *.zip
 *.tar.gz
